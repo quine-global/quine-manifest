@@ -96,17 +96,17 @@ forked_from = "benjamn/recast"
 [repos."quine-global.github.io"]
 bucket = "main"
 
-[repos.homebrew-quintodrome]
+[repos.homebrew-tap]
 bucket = "main"
-github = false
 
 [repos.quine-anaconda-webui]
 bucket = "main"
-github = false
 
-[repos.quine-manifest]
+[repos.taproom]
 bucket = "main"
-github = false # this repo
+
+[repos.quine-manifest] # this repo
+bucket = "main"
 
 # ── boneyard ─────────────────────────────────────────────────────────────────
 [repos.action-gh-release]
