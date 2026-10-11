@@ -91,9 +91,11 @@ github = false
 # ── boneyard ─────────────────────────────────────────────────────────────────
 [repos.action-gh-release]
 bucket = "boneyard"
+import = "code"
 
 [repos.electron-builder]
 bucket = "boneyard"
+import = "code"
 
 # ── labs ─────────────────────────────────────────────────────────────────────
 [repos.layer-wizard]
