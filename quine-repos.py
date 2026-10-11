@@ -235,7 +235,7 @@ def plan_repo(name, spec, world, fj, cfg):
                 p.note(f"no GitHub mirror token for bucket {spec['bucket']} ({token_file or 'mirror_token_file unset'}); can't add push mirror")
             else:
                 p.step(f"Forgejo: add push mirror → {want_url} (sync on commit + every {cfg['interval']}) and sync",
-                       lambda: add_push_mirror(fj, fj_org, name, want_url, read_token(token_file), cfg["interval"]))
+                       lambda: add_push_mirror(fj, fj_org, name, want_url, read_token(token_file), cfg["interval"], gh_org))
 
     # Archive state -----------------------------------------------------------
     if on_github and archived and not gh_repo["archived"]:
@@ -280,7 +280,27 @@ def import_repo(fj, name, spec, primary, gh_org, fj_org, gh_repo, cfg):
         raise RuntimeError(f"import failed: HTTP {status}: {data}")
 
 
-def add_push_mirror(fj, org, name, url, token, interval):
+def check_github_not_ahead(fj, org, name, gh_org):
+    """Refuse to mirror over GitHub commits that Forgejo doesn't have (pushed after the import)."""
+    p = gh("--paginate", f"repos/{gh_org}/{name}/git/matching-refs/", "--jq",
+           '.[] | select(.ref | startswith("refs/heads/") or startswith("refs/tags/")) | "\\(.ref) \\(.object.sha)"',
+           check=False)
+    if p.returncode:
+        if "is empty" in p.stdout + p.stderr:  # empty GitHub repo: nothing to lose
+            return
+        raise RuntimeError(f"couldn't list GitHub refs: {(p.stderr or p.stdout).strip()}")
+    out = p.stdout
+    missing = [ref for ref, sha in (line.split() for line in out.splitlines())
+               if fj.call("GET", f"/repos/{org}/{name}/git/commits/{sha}?stat=false")[0] == 404
+               and fj.call("GET", f"/repos/{org}/{name}/git/tags/{sha}")[0] == 404]
+    if missing:
+        raise RuntimeError(
+            f"GitHub has commits Forgejo lacks on {', '.join(missing[:5])}; the first mirror sync would "
+            f"overwrite them. Pull them into Forgejo first (fetch from GitHub, push to Forgejo), then re-run")
+
+
+def add_push_mirror(fj, org, name, url, token, interval, gh_org):
+    check_github_not_ahead(fj, org, name, gh_org)
     fj.must("POST", f"/repos/{org}/{name}/push_mirrors", {
         "remote_address": url, "remote_username": "oauth2", "remote_password": token,
         "interval": interval, "sync_on_commit": True})
