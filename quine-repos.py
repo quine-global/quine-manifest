@@ -90,7 +90,7 @@ def gh_org_repos(org):
     if gh(f"orgs/{org}", check=False).returncode:
         return None
     out = gh("--paginate", f"orgs/{org}/repos?per_page=100&type=all",
-             "--jq", ".[] | {name, private, archived, fork}").stdout
+             "--jq", ".[] | {name, private, archived, fork, description}").stdout
     return {r["name"]: r for r in map(json.loads, out.splitlines())}
 
 
@@ -153,7 +153,8 @@ def plan_repo(name, spec, world, fj, cfg):
     primary = spec.get("primary", "forgejo")
     upstream = spec.get("upstream")  # Forgejo pull-mirrors this, then push-mirrors to GitHub
     on_github = spec.get("github", True)
-    archived = spec.get("archived", bucket.get("archived", False))
+    explicit_archived = spec.get("archived", bucket.get("archived"))  # None = not stated
+    archived = bool(explicit_archived)
     gh_org, fj_org = bucket["github"], bucket["forgejo"]
     want_url = gh_url(gh_org, name)
 
@@ -171,9 +172,9 @@ def plan_repo(name, spec, world, fj, cfg):
         if cur_org != gh_org and world.gh[gh_org] is None:
             p.note(f"GitHub org {gh_org} doesn't exist; create it at https://github.com/organizations/plan")
             return p
-        if gh_repo["archived"] and not archived and spec.get("archived") is not False:
+        if gh_repo["archived"] and explicit_archived is None:
             # Archived on GitHub but not in the manifest: don't undo it, ask for the manifest to catch up.
-            p.note(f"archived on GitHub; move it to an archived bucket (boneyard), or set archived = false to unarchive")
+            p.note(f"archived on GitHub but the manifest doesn't say; set archived = true to keep it, or false to unarchive")
             return p
         if gh_repo["archived"] and (cur_org != gh_org or not archived):
             # archived repos can't be changed much; unarchive first, re-archive at the end if wanted
@@ -225,6 +226,17 @@ def plan_repo(name, spec, world, fj, cfg):
             p.step(f"Forgejo: make {'private' if gh_repo['private'] else 'public'} to match GitHub",
                    lambda: fj.must("PATCH", f"/repos/{fj_org}/{name}", {"private": gh_repo["private"]}))
 
+    # Fork origin note in the description ------------------------------------
+    if src := spec.get("forked_from"):
+        note_url = src if "://" in src else f"https://github.com/{src}"
+        if on_github and needs_fork_note(gh_repo.get("description"), note_url):
+            p.step(f"GitHub: note 'forked from {note_url}' in description",
+                   lambda: gh("-X", "PATCH", f"repos/{gh_org}/{name}", "-f",
+                              f"description={with_fork_note(gh_repo.get('description'), note_url)}"))
+        if fj_repo.get("_new") or needs_fork_note(fj_repo.get("description"), note_url):
+            p.step(f"Forgejo: note 'forked from {note_url}' in description",
+                   lambda: set_fj_fork_note(fj, fj_org, name, note_url))
+
     # Push mirrors (Forgejo primary) -----------------------------------------
     if on_github and primary == "forgejo":
         mirrors = [] if fj_repo.get("_new") or (fj_repo["mirror"] and not upstream) else \
@@ -256,6 +268,21 @@ def plan_repo(name, spec, world, fj, cfg):
 
 
 # ── actions ──────────────────────────────────────────────────────────────────
+def needs_fork_note(desc, url):
+    return url.lower().removesuffix(".git") not in (desc or "").lower()
+
+
+def with_fork_note(desc, url):
+    desc = (desc or "").strip()
+    return f"{desc} (forked from {url})" if desc else f"Forked from {url}"
+
+
+def set_fj_fork_note(fj, org, name, url):
+    desc = fj.must("GET", f"/repos/{org}/{name}").get("description")
+    if needs_fork_note(desc, url):
+        fj.must("PATCH", f"/repos/{org}/{name}", {"description": with_fork_note(desc, url)})
+
+
 def wait_gh(org, name):
     for _ in range(20):
         if not gh(f"repos/{org}/{name}", check=False).returncode:
@@ -340,6 +367,18 @@ def main():
         sys.exit("no Forgejo token ($FORGEJO_TOKEN or ~/.config/forgejo/token)")
     fj = Forgejo(manifest["forgejo_url"], token)
     world = World(manifest, fj)
+
+    # Every repo in a bucket org must be in the manifest; refuse to touch anything otherwise.
+    unaccounted = []
+    for host, orgs in (("GitHub", world.gh), ("Forgejo", world.fjo)):
+        for org, found in orgs.items():
+            for extra in sorted(set(found or {}) - set(repos)):
+                hint = " (archived)" if found[extra]["archived"] else ""
+                unaccounted.append(f"{host} {org}/{extra}{hint}")
+    if unaccounted:
+        print("\n".join(["✗ REPOS NOT IN THE MANIFEST — add them to manifest.toml before running:",
+                         *(f"    {u}" for u in unaccounted)]), file=sys.stderr)
+        sys.exit(2)
     interval = manifest.get("mirror_interval", "8h0m0s")
 
     plans = []
@@ -388,15 +427,10 @@ def main():
                 failed += 1
                 break
 
-    if not args.repos:
-        managed = set(repos)
-        for host, orgs in (("GitHub", world.gh), ("Forgejo", world.fjo)):
-            for org, found in orgs.items():
-                if found is None:
-                    print(f"? {host} org {org} doesn't exist")
-                for extra in sorted(set(found or {}) - managed):
-                    hint = " (archived: add it to the boneyard)" if found[extra]["archived"] else ""
-                    print(f"? {host} {org}/{extra} is not in the manifest{hint}")
+    for host, orgs in (("GitHub", world.gh), ("Forgejo", world.fjo)):
+        for org, found in orgs.items():
+            if found is None:
+                print(f"? {host} org {org} doesn't exist")
 
     pending = sum(len(p.steps) for p in plans) + len(world.missing_fj_orgs)
     if args.apply:

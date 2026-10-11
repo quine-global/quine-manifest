@@ -4,8 +4,8 @@
 forgejo_url = "https://forge.quinefoundation.com"
 
 # A bucket is a pair of orgs, one per host. Moving a repo between buckets
-# transfers it on both sides. Repos in an `archived` bucket are archived on
-# both sides and lose their push mirror.
+# transfers it on both sides. The boneyard is where retired repos go; they
+# stay unarchived and mirrored like everything else.
 #
 # mirror_token_file: GitHub fine-grained token (resource owner = the bucket's
 # GitHub org, Contents + Workflows read/write) that Forgejo push mirrors use.
@@ -17,12 +17,13 @@ mirror_token_file = "~/.config/forgejo/github-mirror-token" # expires 2027-10-12
 [buckets.labs]
 github = "quine-global-labs"
 forgejo = "quine-global-labs"
-mirror_token_file = "~/.config/forgejo/github-mirror-token-labs"
+mirror_token_file = "~/.config/forgejo/github-mirror-token-labs" # expires 2026-11-10
 
 [buckets.boneyard]
 github = "quine-global-boneyard"
 forgejo = "quine-global-boneyard"
-archived = true
+archived = false # unarchive anything that lands here
+mirror_token_file = "~/.config/forgejo/github-mirror-token-boneyard"
 
 # Per-repo keys (all optional except bucket):
 #   primary = "forgejo" (default): Forgejo is canonical, push-mirrored to GitHub
@@ -32,21 +33,26 @@ archived = true
 #             Use "code" for repos with big release assets: full imports that
 #             take over ~60s die at nginx's proxy timeout and leave the repo
 #             stuck "migrating".
-#   archived = true     archive on both sides without moving to the boneyard
+#   archived = true|false  archive / unarchive on both sides. Unset: leave it, but
+#             report repos that are archived on GitHub (never unarchived silently).
+#   forked_from = "owner/repo" (GitHub) or a URL: noted in both descriptions
 #   upstream = "<url>"  third-party source: Forgejo pull-mirrors it and push-mirrors on to GitHub
 
 # ── main ─────────────────────────────────────────────────────────────────────
 [repos.quintodrome]
 bucket = "main"
+forked_from = "navidrome/navidrome"
 import = "code" # ~3.3 GB of release assets on GitHub, left there
 
 [repos.hyper]
 bucket = "main"
+forked_from = "vercel/hyper"
 primary = "github"
 import = "code" # ~20 GB of release assets on GitHub
 
 [repos."quintodrome.quineglobal.com"]
 bucket = "main"
+forked_from = "quine-global/hyper.quineglobal.com"
 
 [repos."hyper.quineglobal.com"]
 bucket = "main"
@@ -59,15 +65,19 @@ bucket = "main"
 
 [repos.electron-link]
 bucket = "main"
+forked_from = "atom/electron-link"
 
 [repos.ava]
 bucket = "main"
+forked_from = "avajs/ava"
 
 [repos.ava-typescript]
 bucket = "main"
+forked_from = "avajs/typescript"
 
 [repos.electron-drag-click]
 bucket = "main"
+forked_from = "gerhardberger/electron-drag-click"
 
 [repos.ncdu]
 bucket = "main"
@@ -75,9 +85,11 @@ upstream = "https://code.blicky.net/yorhel/ncdu.git" # pull-mirrored, then pushe
 
 [repos.webdriverio]
 bucket = "main"
+forked_from = "webdriverio/webdriverio"
 
 [repos.recast]
 bucket = "main"
+forked_from = "benjamn/recast"
 
 [repos."quine-global.github.io"]
 bucket = "main"
@@ -93,10 +105,12 @@ github = false
 # ── boneyard ─────────────────────────────────────────────────────────────────
 [repos.action-gh-release]
 bucket = "boneyard"
+forked_from = "softprops/action-gh-release"
 import = "code"
 
 [repos.electron-builder]
 bucket = "boneyard"
+forked_from = "electron-userland/electron-builder"
 import = "code"
 
 # ── labs ─────────────────────────────────────────────────────────────────────

@@ -7,7 +7,7 @@ Declares where every Quine repo lives on GitHub and on Forgejo
 |----------|-------------------------|-------------------------|-------------------------------|
 | main     | `quine-global`          | `quine-global`          |                               |
 | labs     | `quine-global-labs`     | `quine-global-labs`     |                               |
-| boneyard | `quine-global-boneyard` | `quine-global-boneyard` | archived on both sides        |
+| boneyard | `quine-global-boneyard` | `quine-global-boneyard` | retired repos (not archived)  |
 
 By default Forgejo is primary and push-mirrors to GitHub (`primary = "forgejo"`).
 With `primary = "github"`, Forgejo holds a pull mirror instead.
@@ -23,7 +23,7 @@ python3.14 quine-repos.py --apply ncdu    # only some repos
 ```
 
 To move a repo, change its `bucket` and apply: it's transferred on both sides,
-its push mirror is repointed, and moving into the boneyard archives it.
+and its push mirror is repointed.
 
 ## Credentials
 
@@ -33,6 +33,9 @@ its push mirror is repointed, and moving into the boneyard archives it.
   whose resource owner is that bucket's GitHub org (Contents + Workflows
   read/write). Fine-grained tokens cover one org, so each bucket needs its own.
   The `main` token expires 2027-10-12.
+
+Every repo in a bucket org (on either host) must be listed in `manifest.toml`;
+the script exits with an error before doing anything if it finds one that isn't.
 
 ## What it won't do
 
