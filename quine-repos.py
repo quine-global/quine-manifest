@@ -238,14 +238,17 @@ def plan_repo(name, spec, world, fj, cfg):
     src = spec.get("forked_from")
     fj_note = ("forked from", src if "://" in src else f"https://github.com/{src}") if src else None
     gh_note = ("mirror of", f"{cfg['forgejo_url'].rstrip('/')}/{fj_org}/{name}") if primary == "forgejo" else None
-    if on_github and (want := described(gh_repo.get("description"), gh_note)) != (gh_repo.get("description") or ""):
+    # The text before the note should match on both hosts; an empty side borrows the other's.
+    gh_base = described(gh_repo.get("description"), None) if on_github else ""
+    fj_base = described(fj_repo.get("description"), None)
+    if on_github and (want := described(gh_base or fj_base, gh_note)) != (gh_repo.get("description") or ""):
         p.step(f"GitHub: description → {want!r}",
                lambda want=want: gh("-X", "PATCH", f"repos/{gh_org}/{name}", "-f", f"description={want}"))
     if fj_repo.get("_new"):
-        p.step("Forgejo: set description note", lambda: set_fj_description(fj, fj_org, name, fj_note))
-    elif (want := described(fj_repo.get("description"), fj_note)) != (fj_repo.get("description") or ""):
+        p.step("Forgejo: set description note", lambda: set_fj_description(fj, fj_org, name, fj_note, gh_base))
+    elif (want := described(fj_base or gh_base, fj_note)) != (fj_repo.get("description") or ""):
         p.step(f"Forgejo: description → {want!r}",
-               lambda: set_fj_description(fj, fj_org, name, fj_note))
+               lambda: set_fj_description(fj, fj_org, name, fj_note, gh_base))
 
     # Push mirrors (Forgejo primary) -----------------------------------------
     if on_github and primary == "forgejo":
@@ -291,9 +294,9 @@ def described(desc, note):
     return f"{base} ({label} {url})" if base else f"{label} {url}"
 
 
-def set_fj_description(fj, org, name, note):
+def set_fj_description(fj, org, name, note, fallback=""):
     desc = fj.must("GET", f"/repos/{org}/{name}").get("description") or ""
-    if (want := described(desc, note)) != desc:
+    if (want := described(described(desc, None) or fallback, note)) != desc:
         fj.must("PATCH", f"/repos/{org}/{name}", {"description": want})
 
 
