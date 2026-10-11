@@ -35,7 +35,9 @@ mirror_token_file = "~/.config/forgejo/github-mirror-token-boneyard" # expires 2
 #             stuck "migrating".
 #   archived = true|false  archive / unarchive on both sides. Unset: leave it, but
 #             report repos that are archived on GitHub (never unarchived silently).
-#   forked_from = "owner/repo" (GitHub) or a URL: noted in both descriptions
+#   forked_from = "owner/repo" (GitHub) or a URL: Forgejo's description says
+#             "(forked from …)". GitHub descriptions of Forgejo-primary repos
+#             always say "(mirror of <Forgejo URL>)" instead.
 #   upstream = "<url>"  third-party source: Forgejo pull-mirrors it and push-mirrors on to GitHub
 
 # ── main ─────────────────────────────────────────────────────────────────────

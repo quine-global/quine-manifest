@@ -9,7 +9,7 @@ Credentials: the Forgejo admin token in $FORGEJO_TOKEN or ~/.config/forgejo/toke
 GitHub admin calls go through the `gh` CLI's login; push mirrors use each
 bucket's mirror_token_file. Never deletes a repository.
 """
-import argparse, json, os, subprocess, sys, time, urllib.error, urllib.request
+import argparse, json, os, re, subprocess, sys, time, urllib.error, urllib.request
 
 try:
     import tomllib
@@ -226,16 +226,19 @@ def plan_repo(name, spec, world, fj, cfg):
             p.step(f"Forgejo: make {'private' if gh_repo['private'] else 'public'} to match GitHub",
                    lambda: fj.must("PATCH", f"/repos/{fj_org}/{name}", {"private": gh_repo["private"]}))
 
-    # Fork origin note in the description ------------------------------------
-    if src := spec.get("forked_from"):
-        note_url = src if "://" in src else f"https://github.com/{src}"
-        if on_github and needs_fork_note(gh_repo.get("description"), note_url):
-            p.step(f"GitHub: note 'forked from {note_url}' in description",
-                   lambda: gh("-X", "PATCH", f"repos/{gh_org}/{name}", "-f",
-                              f"description={with_fork_note(gh_repo.get('description'), note_url)}"))
-        if fj_repo.get("_new") or needs_fork_note(fj_repo.get("description"), note_url):
-            p.step(f"Forgejo: note 'forked from {note_url}' in description",
-                   lambda: set_fj_fork_note(fj, fj_org, name, note_url))
+    # Description notes -------------------------------------------------------
+    # Forgejo says where a fork came from; GitHub (when Forgejo is primary) points at Forgejo.
+    src = spec.get("forked_from")
+    fj_note = ("forked from", src if "://" in src else f"https://github.com/{src}") if src else None
+    gh_note = ("mirror of", f"{cfg['forgejo_url'].rstrip('/')}/{fj_org}/{name}") if primary == "forgejo" else None
+    if on_github and (want := described(gh_repo.get("description"), gh_note)) != (gh_repo.get("description") or ""):
+        p.step(f"GitHub: description → {want!r}",
+               lambda want=want: gh("-X", "PATCH", f"repos/{gh_org}/{name}", "-f", f"description={want}"))
+    if fj_repo.get("_new"):
+        p.step("Forgejo: set description note", lambda: set_fj_description(fj, fj_org, name, fj_note))
+    elif (want := described(fj_repo.get("description"), fj_note)) != (fj_repo.get("description") or ""):
+        p.step(f"Forgejo: description → {want!r}",
+               lambda: set_fj_description(fj, fj_org, name, fj_note))
 
     # Push mirrors (Forgejo primary) -----------------------------------------
     if on_github and primary == "forgejo":
@@ -268,19 +271,22 @@ def plan_repo(name, spec, world, fj, cfg):
 
 
 # ── actions ──────────────────────────────────────────────────────────────────
-def needs_fork_note(desc, url):
-    return url.lower().removesuffix(".git") not in (desc or "").lower()
+NOTE_RE = re.compile(r"\s*\((?:forked from|mirror of) https?://[^)\s]+\)|^(?:forked from|mirror of) https?://\S+$", re.I)
 
 
-def with_fork_note(desc, url):
-    desc = (desc or "").strip()
-    return f"{desc} (forked from {url})" if desc else f"Forked from {url}"
+def described(desc, note):
+    """desc with any of our notes stripped, then `note` = (label, url) appended."""
+    base = NOTE_RE.sub("", desc or "").strip()
+    if not note:
+        return base
+    label, url = note
+    return f"{base} ({label} {url})" if base else f"{label.capitalize()} {url}"
 
 
-def set_fj_fork_note(fj, org, name, url):
-    desc = fj.must("GET", f"/repos/{org}/{name}").get("description")
-    if needs_fork_note(desc, url):
-        fj.must("PATCH", f"/repos/{org}/{name}", {"description": with_fork_note(desc, url)})
+def set_fj_description(fj, org, name, note):
+    desc = fj.must("GET", f"/repos/{org}/{name}").get("description") or ""
+    if (want := described(desc, note)) != desc:
+        fj.must("PATCH", f"/repos/{org}/{name}", {"description": want})
 
 
 def wait_gh(org, name):
@@ -384,7 +390,8 @@ def main():
     plans = []
     for name in args.repos or repos:
         spec = repos[name]
-        cfg = {"interval": interval, "bucket": manifest["buckets"][spec["bucket"]]}
+        cfg = {"interval": interval, "bucket": manifest["buckets"][spec["bucket"]],
+               "forgejo_url": manifest["forgejo_url"]}
         plans.append(plan_repo(name, spec, world, fj, cfg))
 
     changed = failed = 0
