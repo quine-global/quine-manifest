@@ -104,6 +104,10 @@ github = false
 bucket = "main"
 github = false
 
+[repos.quine-manifest]
+bucket = "main"
+github = false # this repo
+
 # ── boneyard ─────────────────────────────────────────────────────────────────
 [repos.action-gh-release]
 bucket = "boneyard"

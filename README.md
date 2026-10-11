@@ -1,6 +1,6 @@
 # quine-manifest
 
-Declares where every Quine repo lives on GitHub and on Forgejo
+Declares where every Quine repo lives (this repo: forge.quinefoundation.com/quine-global/quine-manifest) on GitHub and on Forgejo
 (forge.quinefoundation.com), and a script that makes both match.
 
 | Bucket   | GitHub org              | Forgejo org             | Notes                         |
