@@ -1,0 +1,142 @@
+# Where every Quine repo lives, on GitHub and on Forgejo.
+# `python3.14 quine-repos.py` shows drift; `--apply` fixes it. See README.md.
+
+forgejo_url = "https://forge.quinefoundation.com"
+
+# A bucket is a pair of orgs, one per host. Moving a repo between buckets
+# transfers it on both sides. Repos in an `archived` bucket are archived on
+# both sides and lose their push mirror.
+#
+# mirror_token_file: GitHub fine-grained token (resource owner = the bucket's
+# GitHub org, Contents + Workflows read/write) that Forgejo push mirrors use.
+[buckets.main]
+github = "quine-global"
+forgejo = "Quine"
+mirror_token_file = "~/.config/forgejo/github-mirror-token" # expires 2027-10-12
+
+[buckets.labs]
+github = "quine-global-labs"
+forgejo = "quine-global-labs"
+mirror_token_file = "~/.config/forgejo/github-mirror-token-labs"
+
+[buckets.boneyard]
+github = "quine-global-boneyard"
+forgejo = "quine-global-boneyard"
+archived = true
+
+# Per-repo keys (all optional except bucket):
+#   primary = "forgejo" (default): Forgejo is canonical, push-mirrored to GitHub
+#           | "github": GitHub is canonical, Forgejo holds a pull mirror
+#   github  = false     Forgejo-only repo, nothing on GitHub
+#   import  = "full" (default: issues, PRs, releases, wiki) | "code" (git only).
+#             Use "code" for repos with big release assets: full imports that
+#             take over ~60s die at nginx's proxy timeout and leave the repo
+#             stuck "migrating".
+#   archived = true     archive on both sides without moving to the boneyard
+
+# ── main ─────────────────────────────────────────────────────────────────────
+[repos.quintodrome]
+bucket = "main"
+import = "code" # ~3.3 GB of release assets on GitHub, left there
+
+[repos.hyper]
+bucket = "main"
+primary = "github"
+import = "code" # ~20 GB of release assets on GitHub
+
+[repos."quintodrome.quineglobal.com"]
+bucket = "main"
+
+[repos."hyper.quineglobal.com"]
+bucket = "main"
+
+[repos.guix-builds]
+bucket = "main"
+
+[repos.quine-core]
+bucket = "main"
+
+[repos.electron-link]
+bucket = "main"
+
+[repos.ava]
+bucket = "main"
+
+[repos.ava-typescript]
+bucket = "main"
+
+[repos.electron-drag-click]
+bucket = "main"
+
+[repos.ncdu]
+bucket = "main"
+
+[repos.webdriverio]
+bucket = "main"
+
+[repos.recast]
+bucket = "main"
+
+[repos."quine-global.github.io"]
+bucket = "main"
+
+[repos.homebrew-quintodrome]
+bucket = "main"
+github = false
+
+[repos.quine-anaconda-webui]
+bucket = "main"
+github = false
+
+# ── boneyard ─────────────────────────────────────────────────────────────────
+[repos.action-gh-release]
+bucket = "boneyard"
+
+[repos.electron-builder]
+bucket = "boneyard"
+
+# ── labs ─────────────────────────────────────────────────────────────────────
+[repos.layer-wizard]
+bucket = "labs"
+
+[repos.quple]
+bucket = "labs"
+
+[repos.quine-linux]
+bucket = "labs"
+
+[repos.quine-os]
+bucket = "labs"
+
+[repos.swap-watchdog]
+bucket = "labs"
+
+[repos.usbscan]
+bucket = "labs"
+
+[repos.dnf-package-store]
+bucket = "labs"
+
+[repos.ktoolbox]
+bucket = "labs"
+
+[repos.flathub-ladybird]
+bucket = "labs"
+
+[repos.quine-RideRN]
+bucket = "labs"
+
+[repos.mozsync]
+bucket = "labs"
+
+[repos.charter]
+bucket = "labs"
+
+[repos.bazaar]
+bucket = "labs"
+
+[repos.libreoffice-js]
+bucket = "labs"
+
+[repos.nugitea]
+bucket = "labs"
