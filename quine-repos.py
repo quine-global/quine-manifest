@@ -151,6 +151,7 @@ def plan_repo(name, spec, world, fj, cfg):
     p = Plan(name)
     bucket = world.buckets[spec["bucket"]]
     primary = spec.get("primary", "forgejo")
+    upstream = spec.get("upstream")  # Forgejo pull-mirrors this, then push-mirrors to GitHub
     on_github = spec.get("github", True)
     archived = spec.get("archived", bucket.get("archived", False))
     gh_org, fj_org = bucket["github"], bucket["forgejo"]
@@ -196,9 +197,12 @@ def plan_repo(name, spec, world, fj, cfg):
         if not on_github:
             p.note("Forgejo-only repo is missing from Forgejo; nothing to import from")
             return p
-        p.step(f"Forgejo: import {fj_org}/{name} from GitHub ({'pull mirror' if primary == 'github' else spec.get('import', 'full')})",
+        how = f"pull mirror of {upstream}" if upstream else \
+            f"from GitHub ({'pull mirror' if primary == 'github' else spec.get('import', 'full')})"
+        p.step(f"Forgejo: import {fj_org}/{name} {how}",
                lambda: import_repo(fj, name, spec, primary, gh_org, fj_org, gh_repo, cfg))
-        fj_repo = {"mirror": primary == "github", "archived": False, "private": gh_repo["private"], "_new": True}
+        fj_repo = {"mirror": primary == "github" or bool(upstream), "archived": False,
+                   "private": gh_repo["private"], "_new": True}
     else:
         cur = fj_repo["owner"]["login"]
         if fj_repo["archived"] and (cur.lower() != fj_org.lower() or not archived):
@@ -209,7 +213,11 @@ def plan_repo(name, spec, world, fj, cfg):
                    lambda c=cur: fj.must("POST", f"/repos/{c}/{name}/transfer", {"new_owner": fj_org}))
         if primary == "github" and not fj_repo["mirror"]:
             p.note("should be a pull mirror of GitHub but is a regular repo; recreate it by hand (not automated: needs a delete)")
-        if primary == "forgejo" and fj_repo["mirror"]:
+        if upstream and not fj_repo["mirror"]:
+            p.note(f"should be a pull mirror of {upstream} but is a regular repo; recreate it by hand (not automated: needs a delete)")
+        if upstream and fj_repo["mirror"] and not same_url(fj_repo.get("original_url", ""), upstream):
+            p.note(f"pull mirror points at {fj_repo.get('original_url')}; change it to {upstream} in Settings → Mirror")
+        if primary == "forgejo" and not upstream and fj_repo["mirror"]:
             p.note("is a pull mirror but Forgejo should be primary; use Settings → Convert to regular repository")
         if primary == "github" and fj_repo["mirror"] and on_github and not same_url(fj_repo.get("original_url", ""), want_url):
             p.note(f"pull mirror points at {fj_repo.get('original_url')}; change it to {want_url} in Settings → Mirror")
@@ -219,7 +227,7 @@ def plan_repo(name, spec, world, fj, cfg):
 
     # Push mirrors (Forgejo primary) -----------------------------------------
     if on_github and primary == "forgejo":
-        mirrors = [] if fj_repo.get("_new") or fj_repo["mirror"] else \
+        mirrors = [] if fj_repo.get("_new") or (fj_repo["mirror"] and not upstream) else \
             fj.push_mirrors(fj_repo["owner"]["login"], name)
         keep = [m for m in mirrors if same_url(m["remote_address"], want_url)]
         stale = [m for m in mirrors if "github.com" in m["remote_address"] and m not in keep]
@@ -229,7 +237,7 @@ def plan_repo(name, spec, world, fj, cfg):
         for m in stale + (keep if archived else []):
             p.step(f"Forgejo: remove push mirror → {m['remote_address']}",
                    lambda m=m: fj.must("DELETE", f"/repos/{fj_org}/{name}/push_mirrors/{m['remote_name']}"))
-        if not archived and not keep and not fj_repo["mirror"]:
+        if not archived and not keep and (upstream or not fj_repo["mirror"]):
             token_file = bucket.get("mirror_token_file")
             if not token_file or not read_token(token_file):
                 p.note(f"no GitHub mirror token for bucket {spec['bucket']} ({token_file or 'mirror_token_file unset'}); can't add push mirror")
@@ -259,7 +267,9 @@ def wait_gh(org, name):
 def import_repo(fj, name, spec, primary, gh_org, fj_org, gh_repo, cfg):
     url = gh_url(gh_org, name)
     body = {"clone_addr": url, "repo_owner": fj_org, "repo_name": name, "private": gh_repo["private"]}
-    if primary == "github":
+    if spec.get("upstream"):
+        body |= {"clone_addr": spec["upstream"], "service": "git", "mirror": True, "mirror_interval": cfg["interval"]}
+    elif primary == "github":
         body |= {"service": "git", "mirror": True, "mirror_interval": cfg["interval"]}
         if gh_repo["private"]:  # stored for future syncs, so use the bucket's narrow token
             token = read_token(cfg["bucket"].get("mirror_token_file", ""))

@@ -33,6 +33,7 @@ archived = true
 #             take over ~60s die at nginx's proxy timeout and leave the repo
 #             stuck "migrating".
 #   archived = true     archive on both sides without moving to the boneyard
+#   upstream = "<url>"  third-party source: Forgejo pull-mirrors it and push-mirrors on to GitHub
 
 # ── main ─────────────────────────────────────────────────────────────────────
 [repos.quintodrome]
@@ -70,6 +71,7 @@ bucket = "main"
 
 [repos.ncdu]
 bucket = "main"
+upstream = "https://code.blicky.net/yorhel/ncdu.git" # pull-mirrored, then pushed to GitHub
 
 [repos.webdriverio]
 bucket = "main"
