@@ -31,11 +31,18 @@ class Forgejo:
             self.api + path, method=method,
             data=None if body is None else json.dumps(body).encode(),
             headers={"Authorization": f"token {self.token}", "Content-Type": "application/json"})
-        try:
-            with urllib.request.urlopen(req, timeout=timeout) as r:
-                status, raw = r.status, r.read()
-        except urllib.error.HTTPError as e:
-            status, raw = e.code, e.read()
+        for attempt in range(4):  # the forge sometimes drops connections for a few seconds
+            try:
+                with urllib.request.urlopen(req, timeout=timeout) as r:
+                    status, raw = r.status, r.read()
+                break
+            except urllib.error.HTTPError as e:
+                status, raw = e.code, e.read()
+                break
+            except (urllib.error.URLError, TimeoutError) as e:
+                if attempt == 3 or method != "GET":  # don't retry writes: they may have landed
+                    raise RuntimeError(f"Forgejo {method} {path}: {e}") from None
+                time.sleep(5 * (attempt + 1))
         try:
             data = json.loads(raw) if raw else None
         except ValueError:
@@ -280,7 +287,8 @@ def described(desc, note):
     if not note:
         return base
     label, url = note
-    return f"{base} ({label} {url})" if base else f"{label.capitalize()} {url}"
+    label = label.capitalize()
+    return f"{base} ({label} {url})" if base else f"{label} {url}"
 
 
 def set_fj_description(fj, org, name, note):
