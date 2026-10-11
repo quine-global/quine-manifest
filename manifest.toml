@@ -23,7 +23,7 @@ mirror_token_file = "~/.config/forgejo/github-mirror-token-labs" # expires 2026-
 github = "quine-global-boneyard"
 forgejo = "quine-global-boneyard"
 archived = false # unarchive anything that lands here
-mirror_token_file = "~/.config/forgejo/github-mirror-token-boneyard"
+mirror_token_file = "~/.config/forgejo/github-mirror-token-boneyard" # expires 2027-01-09
 
 # Per-repo keys (all optional except bucket):
 #   primary = "forgejo" (default): Forgejo is canonical, push-mirrored to GitHub
