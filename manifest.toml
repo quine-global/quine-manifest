@@ -11,7 +11,7 @@ forgejo_url = "https://forge.quinefoundation.com"
 # GitHub org, Contents + Workflows read/write) that Forgejo push mirrors use.
 [buckets.main]
 github = "quine-global"
-forgejo = "Quine"
+forgejo = "quine-global"
 mirror_token_file = "~/.config/forgejo/github-mirror-token" # expires 2027-10-12
 
 [buckets.labs]

@@ -170,6 +170,10 @@ def plan_repo(name, spec, world, fj, cfg):
         if cur_org != gh_org and world.gh[gh_org] is None:
             p.note(f"GitHub org {gh_org} doesn't exist; create it at https://github.com/organizations/plan")
             return p
+        if gh_repo["archived"] and not archived and spec.get("archived") is not False:
+            # Archived on GitHub but not in the manifest: don't undo it, ask for the manifest to catch up.
+            p.note(f"archived on GitHub; move it to an archived bucket (boneyard), or set archived = false to unarchive")
+            return p
         if gh_repo["archived"] and (cur_org != gh_org or not archived):
             # archived repos can't be changed much; unarchive first, re-archive at the end if wanted
             p.step(f"GitHub: unarchive {cur_org}/{name}",
@@ -240,8 +244,6 @@ def plan_repo(name, spec, world, fj, cfg):
     if archived and not fj_repo["archived"]:
         p.step(f"Forgejo: archive {fj_org}/{name}",
                lambda: fj.must("PATCH", f"/repos/{fj_org}/{name}", {"archived": True}))
-    if not archived and on_github and gh_repo["archived"]:
-        p.note("archived on GitHub but not in an archived bucket")  # unreachable unless unarchive failed
     return p
 
 
@@ -363,7 +365,8 @@ def main():
                 if found is None:
                     print(f"? {host} org {org} doesn't exist")
                 for extra in sorted(set(found or {}) - managed):
-                    print(f"? {host} {org}/{extra} is not in the manifest")
+                    hint = " (archived: add it to the boneyard)" if found[extra]["archived"] else ""
+                    print(f"? {host} {org}/{extra} is not in the manifest{hint}")
 
     pending = sum(len(p.steps) for p in plans) + len(world.missing_fj_orgs)
     if args.apply:

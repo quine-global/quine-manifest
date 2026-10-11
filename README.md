@@ -5,7 +5,7 @@ Declares where every Quine repo lives on GitHub and on Forgejo
 
 | Bucket   | GitHub org              | Forgejo org             | Notes                         |
 |----------|-------------------------|-------------------------|-------------------------------|
-| main     | `quine-global`          | `Quine`                 |                               |
+| main     | `quine-global`          | `quine-global`          |                               |
 | labs     | `quine-global-labs`     | `quine-global-labs`     |                               |
 | boneyard | `quine-global-boneyard` | `quine-global-boneyard` | archived on both sides        |
 
