@@ -212,3 +212,51 @@ upstream = "https://github.com/ublue-os/akmods.git"
 bucket = "labs"
 github = false
 upstream = "https://github.com/get-aurora-dev/common.git"
+
+# Homebrew integration, copied into Aurora from its image.
+[repos.mirror-ublue-os-brew]
+bucket = "labs"
+github = false
+upstream = "https://github.com/ublue-os/brew.git"
+
+# Sources of the ublue-os/packages COPR RPMs Aurora installs.
+[repos.mirror-ublue-os-packages]
+bucket = "labs"
+github = false
+upstream = "https://github.com/ublue-os/packages.git"
+
+# Fedora's definition of Kinoite, Aurora's base.
+[repos.mirror-fedora-workstation-ostree-config]
+bucket = "labs"
+github = false
+upstream = "https://pagure.io/workstation-ostree-config.git"
+
+# The image rechunker Aurora pins.
+[repos.mirror-coreos-chunkah]
+bucket = "labs"
+github = false
+upstream = "https://github.com/coreos/chunkah.git"
+
+# Anaconda-webui's npm packages (quine-linux's installer build).
+[repos.mirror-rhinstaller-node-cache]
+bucket = "labs"
+github = false
+upstream = "https://github.com/rhinstaller/node-cache.git"
+
+# Anaconda-webui's build takes pkg/lib from it.
+[repos.mirror-cockpit-project-cockpit]
+bucket = "labs"
+github = false
+upstream = "https://github.com/cockpit-project/cockpit.git"
+
+# Quine-linux's live/titanoboa-build-iso.sh comes from here.
+[repos.mirror-ublue-os-titanoboa]
+bucket = "labs"
+github = false
+upstream = "https://github.com/ublue-os/titanoboa.git"
+
+# Aurora's live ISO, which quine-linux's live/ is adapted from.
+[repos.mirror-get-aurora-dev-iso]
+bucket = "labs"
+github = false
+upstream = "https://github.com/get-aurora-dev/iso.git"
