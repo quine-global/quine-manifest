@@ -205,3 +205,10 @@ upstream = "https://github.com/ublue-os/countme.git"
 bucket = "labs"
 github = false
 upstream = "https://github.com/ublue-os/akmods.git"
+
+# Aurora's wallpapers, logos and shared files; its build copies them from
+# the ghcr.io/get-aurora-dev/common image this repo builds.
+[repos.mirror-get-aurora-dev-common]
+bucket = "labs"
+github = false
+upstream = "https://github.com/get-aurora-dev/common.git"
