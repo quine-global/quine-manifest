@@ -260,3 +260,9 @@ upstream = "https://github.com/ublue-os/titanoboa.git"
 bucket = "labs"
 github = false
 upstream = "https://github.com/get-aurora-dev/iso.git"
+
+# KDE's wallpapers (Autumn and others), packaged by Fedora as plasma-workspace-wallpapers.
+[repos.mirror-kde-plasma-workspace-wallpapers]
+bucket = "labs"
+github = false
+upstream = "https://invent.kde.org/plasma/plasma-workspace-wallpapers.git"
