@@ -164,3 +164,44 @@ bucket = "labs"
 
 [repos.nugitea]
 bucket = "labs"
+
+# Quine Linux's stage 0: our Aurora build, published to the forge's registry
+# (.forgejo/workflows/build.yml). Not on GitHub: a copy there would run
+# upstream's .github/workflows.
+[repos.aurora]
+bucket = "labs"
+github = false
+forked_from = "ublue-os/aurora"
+
+# Pull mirrors the aurora and quine-linux builds read instead of GitHub and
+# code.forgejo.org. Forgejo-only: no point copying them back to GitHub.
+# mirror-ublue-os-aurora syncs hourly (set by hand); the rest every 8h.
+[repos.mirror-ublue-os-aurora]
+bucket = "labs"
+github = false
+upstream = "https://github.com/ublue-os/aurora.git"
+
+[repos.mirror-actions-checkout]
+bucket = "labs"
+github = false
+upstream = "https://code.forgejo.org/actions/checkout.git"
+
+[repos.mirror-rcaloras-bash-preexec]
+bucket = "labs"
+github = false
+upstream = "https://github.com/rcaloras/bash-preexec.git"
+
+[repos.mirror-coreos-fedora-coreos-config]
+bucket = "labs"
+github = false
+upstream = "https://github.com/coreos/fedora-coreos-config.git"
+
+[repos.mirror-ublue-os-countme]
+bucket = "labs"
+github = false
+upstream = "https://github.com/ublue-os/countme.git"
+
+[repos.mirror-ublue-os-akmods]
+bucket = "labs"
+github = false
+upstream = "https://github.com/ublue-os/akmods.git"
