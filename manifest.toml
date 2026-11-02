@@ -266,3 +266,17 @@ upstream = "https://github.com/get-aurora-dev/iso.git"
 bucket = "labs"
 github = false
 upstream = "https://invent.kde.org/plasma/plasma-workspace-wallpapers.git"
+
+# KDE's plasma-desktop: the mirror, and our fork of it, whose quine-v<version>
+# branches carry Quine Linux's changes (Kickoff's update bar); quine-linux
+# builds Kickoff from them. The fork's default branch, quine, holds its
+# README and the workflow that makes a branch for each new Plasma release.
+[repos.mirror-kde-plasma-desktop]
+bucket = "labs"
+github = false
+upstream = "https://invent.kde.org/plasma/plasma-desktop.git"
+
+[repos.plasma-desktop]
+bucket = "labs"
+github = false
+forked_from = "https://invent.kde.org/plasma/plasma-desktop"
