@@ -70,6 +70,12 @@ github = false
 bucket = "main"
 github = false
 
+# Public, so other repos' workflows can load it (`uses:`); it holds the
+# action and build scripts only, no secrets. (OK'd 2026-11-03.)
+[repos.app-build] # the RPM build action our in-house apps use
+bucket = "main"
+github = false
+
 [repos.guix-builds]
 bucket = "main"
 
