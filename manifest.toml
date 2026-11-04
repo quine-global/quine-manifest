@@ -70,6 +70,14 @@ github = false
 bucket = "main"
 github = false
 
+# Our fork of rgit, the read-only git web frontend behind
+# git.quinefoundation.com; its deploy workflow pins the image in
+# petersweb-infra, like the websites'.
+[repos.rgit]
+bucket = "main"
+github = false
+forked_from = "w4/rgit"
+
 # Public, so other repos' workflows can load it (`uses:`); it holds the
 # action and build scripts only, no secrets. (OK'd 2026-11-03.)
 [repos.app-build] # the RPM build action our in-house apps use
