@@ -37,6 +37,10 @@ and its push mirror is repointed.
 Every repo in a bucket org (on either host) must be listed in `manifest.toml`;
 the script exits with an error before doing anything if it finds one that isn't.
 
+Upstream mirrors (`upstream = …`) have Forgejo Actions off unless they say
+`actions = true`: they carry upstream's own CI, which would sit "waiting"
+forever for runners we don't have.
+
 ## What it won't do
 
 - Delete repositories. A repo that's the wrong kind (a regular repo that should
