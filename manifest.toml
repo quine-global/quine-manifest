@@ -1,7 +1,7 @@
 # Where every Quine repo lives, on GitHub and on Forgejo.
 # `python3.14 quine-repos.py` shows drift; `--apply` fixes it. See README.md.
 
-forgejo_url = "https://forge.quinefoundation.com"
+forgejo_url = "https://forge.in.quineglobal.com"
 
 # A bucket is a pair of orgs, one per host. Moving a repo between buckets
 # transfers it on both sides. The boneyard is where retired repos go; they
