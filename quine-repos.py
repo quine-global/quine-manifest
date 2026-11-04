@@ -233,6 +233,15 @@ def plan_repo(name, spec, world, fj, cfg):
             p.step(f"Forgejo: make {'private' if gh_repo['private'] else 'public'} to match GitHub",
                    lambda: fj.must("PATCH", f"/repos/{fj_org}/{name}", {"private": gh_repo["private"]}))
 
+    # Actions -----------------------------------------------------------------
+    # Upstream mirrors carry upstream's own CI (.github/workflows), which Forgejo
+    # would start on every sync and leave "waiting" forever for runners we don't
+    # have. So their Actions are off unless the manifest says otherwise.
+    want_actions = spec.get("actions", False if upstream else None)  # None = leave it
+    if want_actions is not None and (fj_repo.get("_new") or fj_repo.get("has_actions") != want_actions):
+        p.step(f"Forgejo: turn Actions {'on' if want_actions else 'off'}",
+               lambda: fj.must("PATCH", f"/repos/{fj_org}/{name}", {"has_actions": want_actions}))
+
     # Description notes -------------------------------------------------------
     # Forgejo says where a fork came from; GitHub (when Forgejo is primary) points at Forgejo.
     src = spec.get("forked_from")
