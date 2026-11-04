@@ -62,6 +62,14 @@ forked_from = "quine-global/hyper.quineglobal.com"
 [repos."hyper.quineglobal.com"]
 bucket = "main"
 
+[repos."linux.quineglobal.com"] # private for now
+bucket = "main"
+github = false
+
+[repos.site-image] # the build-and-bump action the *.quineglobal.com sites use
+bucket = "main"
+github = false
+
 [repos.guix-builds]
 bucket = "main"
 
