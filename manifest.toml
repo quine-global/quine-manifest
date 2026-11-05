@@ -78,6 +78,16 @@ bucket = "main"
 github = false
 forked_from = "w4/rgit"
 
+# Our fork of git-sync, with --exechook-path (the hook only for commits that
+# change given paths); petersweb-infra builds it as a patch on upstream's
+# release (nixos/git-sync/). Actions off: it carries upstream's CI, which
+# builds in upstream's Docker images and fails on our runners.
+[repos.git-sync]
+bucket = "main"
+github = false
+forked_from = "kubernetes/git-sync"
+actions = false
+
 # Public, so other repos' workflows can load it (`uses:`); it holds the
 # action and build scripts only, no secrets. (OK'd 2026-11-03.)
 [repos.app-build] # the RPM build action our in-house apps use
