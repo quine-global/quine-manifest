@@ -78,6 +78,13 @@ bucket = "main"
 github = false
 forked_from = "w4/rgit"
 
+# The container image the forge's ubuntu-latest jobs run in: official
+# node:24-bookworm plus a few tools, in place of catthehacker's image. Its
+# deploy workflow pins the image in petersweb-infra's nixos/linux.nix.
+[repos.ci-image]
+bucket = "main"
+github = false
+
 # Our fork of git-sync, with --exechook-path (the hook only for commits that
 # change given paths); petersweb-infra builds it as a patch on upstream's
 # release (nixos/git-sync/). Actions off: it carries upstream's CI, which
