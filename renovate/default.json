@@ -1,18 +1,29 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "description": "Quine's Renovate defaults: what every repo's renovate.json extends (local>quine-global/quine-manifest//renovate/default). Renovate runs on the forge VM (petersweb-infra's nixos/renovate.nix).",
-  "extends": ["config:recommended"],
+  "extends": [
+    "config:recommended"
+  ],
   "timezone": "America/Anchorage",
-  "schedule": ["* 0-5 * * 1"],
+  "schedule": [
+    "* 0-5 * * 1"
+  ],
+  "prHourlyLimit": 20,
   "prConcurrentLimit": 5,
   "github-actions": {
-    "managerFilePatterns": ["/^\\.(forgejo|gitea|github)/workflows/[^/]+\\.ya?ml$/"]
+    "managerFilePatterns": [
+      "/^\\.(forgejo|gitea|github)/workflows/[^/]+\\.ya?ml$/"
+    ]
   },
   "packageRules": [
     {
       "description": "Our own images on the forge: their repos' deploy workflows bump them (quine-global/site-image), and the forge's copies of upstream images move by hand.",
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["forge.in.quineglobal.com/**"],
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "forge.in.quineglobal.com/**"
+      ],
       "enabled": false
     }
   ]
