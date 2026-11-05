@@ -279,6 +279,9 @@ def plan_repo(name, spec, world, fj, cfg):
                 p.step(f"Forgejo: add push mirror → {want_url} (sync on commit + every {cfg['interval']}) and sync",
                        lambda: add_push_mirror(fj, fj_org, name, want_url, read_token(token_file), cfg["interval"], gh_org))
 
+    # Renovate -----------------------------------------------------------------
+    plan_renovate(p, name, spec, fj_org, fj_repo, archived, fj, cfg)
+
     # Archive state -----------------------------------------------------------
     if on_github and archived and not gh_repo["archived"]:
         p.step(f"GitHub: archive {gh_org}/{name}",
@@ -287,6 +290,54 @@ def plan_repo(name, spec, world, fj, cfg):
         p.step(f"Forgejo: archive {fj_org}/{name}",
                lambda: fj.must("PATCH", f"/repos/{fj_org}/{name}", {"archived": True}))
     return p
+
+
+# Every event that can mean "look again": pushes (a merged update, a ticked
+# rebase box), PRs and their comments, and issues (the Dependency Dashboard).
+RENOVATE_EVENTS = [
+    "push", "issues", "issue_assign", "issue_label", "issue_milestone", "issue_comment",
+    "pull_request", "pull_request_assign", "pull_request_label", "pull_request_milestone",
+    "pull_request_comment", "pull_request_review_approved", "pull_request_review_rejected",
+    "pull_request_review_comment", "pull_request_sync", "pull_request_review_request",
+]
+
+
+def renovate_wanted(spec, cfg):
+    rcfg = cfg["renovate"]
+    if "renovate" in spec:
+        return spec["renovate"]
+    return (spec["bucket"] in rcfg.get("buckets", []) and not spec.get("forked_from")
+            and not spec.get("upstream") and spec.get("primary", "forgejo") == "forgejo")
+
+
+def plan_renovate(p, name, spec, fj_org, fj_repo, archived, fj, cfg):
+    """Renovate's access and webhook, for the repos it covers. Mirrors and
+    archived repos can't take its PRs. Turning it off is reported, not undone."""
+    rcfg = cfg["renovate"]
+    if not rcfg:
+        return
+    user, url = rcfg["user"], rcfg["webhook"]
+    new = fj_repo.get("_new")
+    has_user = has_hook = False
+    if not new:
+        perm = fj.call("GET", f"/repos/{fj_org}/{name}/collaborators/{user}/permission")
+        has_user = perm[0] == 200 and perm[1].get("permission") in ("write", "admin", "owner")
+        has_hook = any(h.get("config", {}).get("url") == url
+                       for h in fj.must("GET", f"/repos/{fj_org}/{name}/hooks") or [])
+    if not renovate_wanted(spec, cfg):
+        if has_user or has_hook:
+            p.note(f"renovate is off for it, but {user} still has access or its webhook; remove them by hand if meant")
+        return
+    if archived or fj_repo.get("mirror"):
+        return
+    if not has_user:
+        p.step(f"Forgejo: give {user} write access (Renovate)",
+               lambda: fj.must("PUT", f"/repos/{fj_org}/{name}/collaborators/{user}", {"permission": "write"}))
+    if not has_hook:
+        p.step(f"Forgejo: add Renovate's webhook → {url}",
+               lambda: fj.must("POST", f"/repos/{fj_org}/{name}/hooks", {
+                   "type": "forgejo", "active": True, "branch_filter": "*", "events": RENOVATE_EVENTS,
+                   "config": {"url": url, "content_type": "json", "http_method": "post"}}))
 
 
 # ── actions ──────────────────────────────────────────────────────────────────
@@ -411,7 +462,7 @@ def main():
     for name in args.repos or repos:
         spec = repos[name]
         cfg = {"interval": interval, "bucket": manifest["buckets"][spec["bucket"]],
-               "forgejo_url": manifest["forgejo_url"]}
+               "forgejo_url": manifest["forgejo_url"], "renovate": manifest.get("renovate")}
         plans.append(plan_repo(name, spec, world, fj, cfg))
 
     changed = failed = 0

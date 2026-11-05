@@ -41,6 +41,24 @@ Upstream mirrors (`upstream = …`) have Forgejo Actions off unless they say
 `actions = true`: they carry upstream's own CI, which would sit "waiting"
 forever for runners we don't have.
 
+## Renovate
+
+[Renovate](https://docs.renovatebot.com/) opens dependency update PRs on the
+forge (it runs on the forge VM: petersweb-infra's `nixos/renovate.nix` and
+`docs/RENOVATE.md`). For every repo it covers, `--apply` gives the forge's
+`renovate` account write access and adds the webhook that wakes it
+(`[renovate]` in `manifest.toml`). Renovate then finds the repo itself and
+opens a "Configure Renovate" PR adding a `renovate.json` that extends
+[`renovate/default.json`](renovate/default.json), the shared defaults: the
+schedule (Monday mornings), Forgejo workflows, and leaving our own forge
+images to their deploy workflows. Nothing else happens in a repo until that
+PR is merged; put anything repo-specific in its own `renovate.json`.
+
+It covers our own repos in the main and labs buckets by default, not forks
+(`forked_from`: their dependencies come with upstream merges) or mirrors. A
+repo's `renovate = true` or `false` overrides that. Turning it off is only
+reported: remove the collaborator and webhook by hand.
+
 ## What it won't do
 
 - Delete repositories. A repo that's the wrong kind (a regular repo that should

@@ -3,6 +3,19 @@
 
 forgejo_url = "https://forge.in.quineglobal.com"
 
+# Renovate (petersweb-infra's nixos/renovate.nix): dependency update PRs on
+# the forge. For each repo it covers, the script makes its `user` a
+# collaborator with write access and adds the webhook that wakes it; Renovate
+# finds those repos itself and opens a "Configure Renovate" PR in each new one
+# (its renovate.json, extending renovate/default.json here). By default it
+# covers our own repos in these buckets, not forks of other projects (whose
+# dependencies come with upstream merges) or mirrors; a repo's
+# `renovate = true|false` overrides that.
+[renovate]
+user = "renovate"
+buckets = ["main", "labs"]
+webhook = "http://10.89.0.1:9055/hooks/renovate" # the forge VM, as Forgejo's container sees it
+
 # A bucket is a pair of orgs, one per host. Moving a repo between buckets
 # transfers it on both sides. The boneyard is where retired repos go; they
 # stay unarchived and mirrored like everything else.
@@ -35,6 +48,9 @@ mirror_token_file = "~/.config/forgejo/github-mirror-token-boneyard" # expires 2
 #             stuck "migrating".
 #   archived = true|false  archive / unarchive on both sides. Unset: leave it, but
 #             report repos that are archived on GitHub (never unarchived silently).
+#   renovate = true|false  Renovate on / off ([renovate] above). Unset: on for
+#             our own repos in its buckets, off for forks (forked_from) and
+#             mirrors.
 #   actions = true|false  Forgejo Actions on / off. Unset: off for upstream
 #             mirrors (they carry upstream's CI, which would sit "waiting" for
 #             runners we don't have), left alone for everything else.
@@ -47,6 +63,7 @@ mirror_token_file = "~/.config/forgejo/github-mirror-token-boneyard" # expires 2
 [repos.quintodrome]
 bucket = "main"
 forked_from = "navidrome/navidrome"
+renovate = true # its renovate.json leaves Navidrome's own go.mod to upstream merges
 import = "code" # ~3.3 GB of release assets on GitHub, left there
 
 [repos.hyper]
