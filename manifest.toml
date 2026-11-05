@@ -58,6 +58,9 @@ mirror_token_file = "~/.config/forgejo/github-mirror-token-boneyard" # expires 2
 #             "(Forked from …)". GitHub descriptions of Forgejo-primary repos
 #             always say "(Mirror of <Forgejo URL>)" instead.
 #   upstream = "<url>"  third-party source: Forgejo pull-mirrors it and push-mirrors on to GitHub
+#   description = "…"  the repo's description on both hosts (before the
+#             Forked from / Mirror of note). Unset: keep whatever the hosts
+#             have, copying one side's to an empty other.
 
 # ── main ─────────────────────────────────────────────────────────────────────
 [repos.quintodrome]
@@ -74,10 +77,12 @@ import = "code" # ~20 GB of release assets on GitHub
 
 [repos."quintodrome.quineglobal.com"]
 bucket = "main"
+description = "Website and auto-update feed servers for Quintodrome and Quine Hyper"
 forked_from = "quine-global/hyper.quineglobal.com"
 
 [repos."hyper.quineglobal.com"]
 bucket = "main"
+description = "Website and auto-update feed server for Quine Hyper"
 
 [repos."linux.quineglobal.com"] # private for now
 bucket = "main"
@@ -154,12 +159,14 @@ forked_from = "benjamn/recast"
 
 [repos."quine-global.github.io"]
 bucket = "main"
+description = "Quine Global's GitHub Pages site"
 
 [repos.homebrew-tap]
 bucket = "main"
 
 [repos.quine-anaconda-webui]
 bucket = "main"
+description = "Quine Linux's installer: our copy of Anaconda's web UI (rhinstaller/anaconda-webui)"
 
 [repos.taproom]
 bucket = "main"
@@ -184,21 +191,26 @@ bucket = "labs"
 
 [repos.quple]
 bucket = "labs"
+description = "Call someone by their Quine username: a Tauri desktop app on Jitsi Meet"
 
 [repos.quine-linux]
 bucket = "labs"
+description = "Quine Linux: a bootc image built on our Aurora build (Universal Blue)"
 
 [repos.quine-os]
 bucket = "labs"
+description = "Build and CI guidelines for Quine OS's apps"
 
 [repos.swap-watchdog]
 bucket = "labs"
 
 [repos.usbscan]
 bucket = "labs"
+description = "Finds failing USB ports: lsusb, sysfs hub ports and kernel faults in one table"
 
 [repos.dnf-package-store]
 bucket = "labs"
+description = "Flutter app for browsing DNF packages and trying them with transient installs"
 
 [repos.ktoolbox]
 bucket = "labs"
@@ -211,8 +223,9 @@ bucket = "labs"
 
 [repos.mozsync]
 bucket = "labs"
+description = "Signs in to Firefox Sync and imports your bookmarks into Chromium or Falkon"
 
-[repos.charter]
+[repos.charter] # empty so far: no commits, no description
 bucket = "labs"
 
 [repos.bazaar]
@@ -220,6 +233,7 @@ bucket = "labs"
 
 [repos.libreoffice-js]
 bucket = "labs"
+description = "Tauri + React word processor modelled on LibreOffice Writer"
 
 [repos.nugitea]
 bucket = "labs"
