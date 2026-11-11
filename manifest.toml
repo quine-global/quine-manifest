@@ -85,6 +85,7 @@ import = "code" # ~20 GB of release assets on GitHub
 bucket = "main"
 description = "Website and auto-update feed servers for Quintodrome and Quine Hyper"
 forked_from = "quine-global/hyper.quineglobal.com"
+renovate = true # a fork, but its dependencies are its own: Dependabot covers it
 
 [repos."hyper.quineglobal.com"]
 bucket = "main"
@@ -251,6 +252,7 @@ bucket = "labs"
 bucket = "labs"
 github = false
 forked_from = "ublue-os/aurora"
+renovate = true # has its own .forgejo/dependabot.yml: Dependabot covers it
 
 # Pull mirrors the aurora and quine-linux builds read instead of GitHub and
 # code.forgejo.org. Forgejo-only: no point copying them back to GitHub.
