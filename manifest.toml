@@ -11,8 +11,14 @@ forgejo_url = "https://forge.in.quineglobal.com"
 # covers our own repos in these buckets, not forks of other projects (whose
 # dependencies come with upstream merges) or mirrors; a repo's
 # `renovate = true|false` overrides that.
+#
+# Renovate is off now (2026-11-10): Dependabot (quine-global-labs/
+# dependabot-core) opens the dependency PRs, as the same account, renamed
+# from `renovate` to `dependabot` so the PRs are its and not a person's. It
+# needs the same write access, which this section still grants; the
+# webhooks it adds now wake nothing.
 [renovate]
-user = "renovate"
+user = "dependabot"
 buckets = ["main", "labs"]
 webhook = "http://10.89.0.1:9055/hooks/renovate" # the forge VM, as Forgejo's container sees it
 
