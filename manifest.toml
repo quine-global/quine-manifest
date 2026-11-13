@@ -219,69 +219,69 @@ import = "code"
 
 # ── labs ─────────────────────────────────────────────────────────────────────
 [repos.layer-wizard]
-bucket = "labs"
+bucket = "main"
 description = "GUI wizard for permanent rpm-ostree package layers with reboot + rollback, on bootc/image-based Linux systems"
 
 [repos.quple]
-bucket = "labs"
+bucket = "main"
 description = "Call someone by their Quine username: a Tauri desktop app on Jitsi Meet"
 
 [repos.quine-linux]
-bucket = "labs"
+bucket = "main"
 description = "Quine Linux: a bootc image built on our Aurora build (Universal Blue)"
 
 [repos.quine-os]
-bucket = "labs"
+bucket = "main"
 description = "Build and CI guidelines for Quine OS's apps"
 
 [repos.swap-watchdog]
-bucket = "labs"
+bucket = "main"
 description = "Watchdog + always-ready Force Quit GUI for when swap fills up and the desktop stops responding"
 
 [repos.usbscan]
-bucket = "labs"
+bucket = "main"
 description = "Finds failing USB ports: lsusb, sysfs hub ports and kernel faults in one table"
 
 [repos.dnf-package-store]
-bucket = "labs"
+bucket = "main"
 description = "Flutter app for browsing DNF packages and trying them with transient installs"
 
 [repos.ktoolbox]
-bucket = "labs"
+bucket = "main"
 description = "A minimal Flutter GUI for managing Toolbox containers on KDE"
 
 [repos.flathub-ladybird]
-bucket = "labs"
+bucket = "main"
 description = "Flatpak packaging for the Ladybird web browser (work in progress)"
 
 [repos.quine-RideRN]
-bucket = "labs"
+bucket = "main"
 description = "Open source rideshare app"
 
 [repos.mozsync]
-bucket = "labs"
+bucket = "main"
 description = "Signs in to Firefox Sync and imports your bookmarks into Chromium or Falkon"
 
 [repos.charter] # empty so far: no commits, no description
-bucket = "labs"
+bucket = "main"
 
 [repos.bazaar]
-bucket = "labs"
+bucket = "main"
 description = "Fork of Bazaar (Flatpak store) https://gitlab.gnome.org/World/bazaar.git"
 
 [repos.libreoffice-js]
-bucket = "labs"
+bucket = "main"
 description = "Tauri + React word processor modelled on LibreOffice Writer"
 
 [repos.nugitea]
-bucket = "labs"
+bucket = "main"
 description = "[DRAFT] Will replace Github someday (complete rewrite of gitea)"
 
 # Quine Linux's stage 0: our Aurora build, published to the forge's registry
 # (.forgejo/workflows/build.yml). Not on GitHub: a copy there would run
 # upstream's .github/workflows.
 [repos.aurora]
-bucket = "labs"
+bucket = "main"
 description = "Fork of Aurora: stage 0 of Quine Linux, built and published here"
 github = false
 forked_from = "ublue-os/aurora"
@@ -292,37 +292,37 @@ renovate = true # has its own .forgejo/dependabot.yml: Dependabot covers it
 # Actions off (the default for `upstream` repos): their upstream CI never runs here.
 # mirror-ublue-os-aurora syncs hourly (set by hand); the rest every 8h.
 [repos.mirror-ublue-os-aurora]
-bucket = "labs"
+bucket = "main"
 description = "Read-only pull mirror of github.com/ublue-os/aurora. quine-global-labs/aurora merges from here."
 github = false
 upstream = "https://github.com/ublue-os/aurora.git"
 
 [repos.mirror-actions-checkout]
-bucket = "labs"
+bucket = "main"
 description = "Read-only pull mirror of code.forgejo.org/actions/checkout. Our workflows use it instead of actions/checkout."
 github = false
 upstream = "https://code.forgejo.org/actions/checkout.git"
 
 [repos.mirror-rcaloras-bash-preexec]
-bucket = "labs"
+bucket = "main"
 description = "Read-only pull mirror of github.com/rcaloras/bash-preexec. Aurora's build fetches bash-preexec.sh from here."
 github = false
 upstream = "https://github.com/rcaloras/bash-preexec.git"
 
 [repos.mirror-coreos-fedora-coreos-config]
-bucket = "labs"
+bucket = "main"
 description = "Read-only pull mirror of github.com/coreos/fedora-coreos-config. Aurora's build fetches coreos-sulogin-force-generator from here."
 github = false
 upstream = "https://github.com/coreos/fedora-coreos-config.git"
 
 [repos.mirror-ublue-os-countme]
-bucket = "labs"
+bucket = "main"
 description = "Read-only pull mirror of github.com/ublue-os/countme. Aurora's build fetches badge-endpoints/aurora.json from here."
 github = false
 upstream = "https://github.com/ublue-os/countme.git"
 
 [repos.mirror-ublue-os-akmods]
-bucket = "labs"
+bucket = "main"
 description = "Read-only pull mirror of github.com/ublue-os/akmods. Aurora's build fetches certs/public_key.der from here."
 github = false
 upstream = "https://github.com/ublue-os/akmods.git"
@@ -330,70 +330,70 @@ upstream = "https://github.com/ublue-os/akmods.git"
 # Aurora's wallpapers, logos and shared files; its build copies them from
 # the ghcr.io/get-aurora-dev/common image this repo builds.
 [repos.mirror-get-aurora-dev-common]
-bucket = "labs"
+bucket = "main"
 description = "Read-only pull mirror of github.com/get-aurora-dev/common: Aurora's wallpapers, logos and shared files, which Aurora's build copies from its image."
 github = false
 upstream = "https://github.com/get-aurora-dev/common.git"
 
 # Homebrew integration, copied into Aurora from its image.
 [repos.mirror-ublue-os-brew]
-bucket = "labs"
+bucket = "main"
 description = "Read-only pull mirror of github.com/ublue-os/brew: the Homebrew integration Aurora's build copies from its image."
 github = false
 upstream = "https://github.com/ublue-os/brew.git"
 
 # Sources of the ublue-os/packages COPR RPMs Aurora installs.
 [repos.mirror-ublue-os-packages]
-bucket = "labs"
+bucket = "main"
 description = "Read-only pull mirror of github.com/ublue-os/packages: sources of the ublue-os/packages COPR RPMs Aurora installs."
 github = false
 upstream = "https://github.com/ublue-os/packages.git"
 
 # Fedora's definition of Kinoite, Aurora's base.
 [repos.mirror-fedora-workstation-ostree-config]
-bucket = "labs"
+bucket = "main"
 description = "Read-only pull mirror of pagure.io/workstation-ostree-config: Fedora's definition of Kinoite, Aurora's base image."
 github = false
 upstream = "https://pagure.io/workstation-ostree-config.git"
 
 # The image rechunker Aurora pins.
 [repos.mirror-coreos-chunkah]
-bucket = "labs"
+bucket = "main"
 description = "Read-only pull mirror of github.com/coreos/chunkah: the image rechunker Aurora pins in image-versions.yml."
 github = false
 upstream = "https://github.com/coreos/chunkah.git"
 
 # Anaconda-webui's npm packages (quine-linux's installer build).
 [repos.mirror-rhinstaller-node-cache]
-bucket = "labs"
+bucket = "main"
 description = "Read-only pull mirror of github.com/rhinstaller/node-cache: anaconda-webui's npm packages, which quine-linux's installer build uses."
 github = false
 upstream = "https://github.com/rhinstaller/node-cache.git"
 
 # Anaconda-webui's build takes pkg/lib from it.
 [repos.mirror-cockpit-project-cockpit]
-bucket = "labs"
+bucket = "main"
 description = "Read-only pull mirror of github.com/cockpit-project/cockpit: anaconda-webui's build takes pkg/lib from it."
 github = false
 upstream = "https://github.com/cockpit-project/cockpit.git"
 
 # Quine-linux's live/titanoboa-build-iso.sh comes from here.
 [repos.mirror-ublue-os-titanoboa]
-bucket = "labs"
+bucket = "main"
 description = "Read-only pull mirror of github.com/ublue-os/titanoboa: quine-linux's live/titanoboa-build-iso.sh comes from here."
 github = false
 upstream = "https://github.com/ublue-os/titanoboa.git"
 
 # Aurora's live ISO, which quine-linux's live/ is adapted from.
 [repos.mirror-get-aurora-dev-iso]
-bucket = "labs"
+bucket = "main"
 description = "Read-only pull mirror of github.com/get-aurora-dev/iso: Aurora's live ISO, which quine-linux's live/ is adapted from."
 github = false
 upstream = "https://github.com/get-aurora-dev/iso.git"
 
 # KDE's wallpapers (Autumn and others), packaged by Fedora as plasma-workspace-wallpapers.
 [repos.mirror-kde-plasma-workspace-wallpapers]
-bucket = "labs"
+bucket = "main"
 description = "Read-only pull mirror of invent.kde.org/plasma/plasma-workspace-wallpapers: KDE's wallpapers (Autumn, Altai, Cascade, ...), which Fedora packages as plasma-workspace-wallpapers."
 github = false
 upstream = "https://invent.kde.org/plasma/plasma-workspace-wallpapers.git"
@@ -403,13 +403,50 @@ upstream = "https://invent.kde.org/plasma/plasma-workspace-wallpapers.git"
 # builds Kickoff from them. The fork's default branch, quine, holds its
 # README and the workflow that makes a branch for each new Plasma release.
 [repos.mirror-kde-plasma-desktop]
-bucket = "labs"
+bucket = "main"
 description = "Pull mirror of invent.kde.org/plasma/plasma-desktop. Our fork with Quine Linux changes: quine-global-labs/plasma-desktop."
 github = false
 upstream = "https://invent.kde.org/plasma/plasma-desktop.git"
 
 [repos.plasma-desktop]
-bucket = "labs"
+bucket = "main"
 description = "Fork of KDE's plasma-desktop (via mirror-kde-plasma-desktop) with Quine Linux's changes: a quine-v<version> branch per Plasma version, built by quine-linux (Kickoff's update bar)."
 github = false
 forked_from = "https://invent.kde.org/plasma/plasma-desktop"
+
+# Moved here from quine-global-labs (2026-11-13), not listed until then.
+[repos.dependabot-core]
+bucket = "main"
+description = "Dependabot on the forge: a fork of dependabot/dependabot-core with a Forgejo runner (forgejo/)"
+github = false
+forked_from = "dependabot/dependabot-core"
+
+[repos.keymaker]
+bucket = "main"
+github = false
+forked_from = "tobagin/keymaker"
+
+[repos.kleopatra]
+bucket = "main"
+github = false
+forked_from = "https://invent.kde.org/pim/kleopatra"
+
+[repos.libkleo]
+bucket = "main"
+github = false
+forked_from = "https://invent.kde.org/pim/libkleo"
+
+[repos.mirror-keymaker]
+bucket = "main"
+github = false
+upstream = "https://github.com/tobagin/keymaker.git"
+
+[repos.mirror-kde-kleopatra]
+bucket = "main"
+github = false
+upstream = "https://invent.kde.org/pim/kleopatra.git"
+
+[repos.mirror-kde-libkleo]
+bucket = "main"
+github = false
+upstream = "https://invent.kde.org/pim/libkleo.git"
