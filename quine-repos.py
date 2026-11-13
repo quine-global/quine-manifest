@@ -212,7 +212,7 @@ def plan_repo(name, spec, world, fj, cfg):
     if world.fjo[fj_org] is None:
         world.missing_fj_orgs.add(fj_org)  # created once, before any repo steps
     if fj_repo is None:
-        if not on_github:
+        if not on_github and not upstream:
             p.note("Forgejo-only repo is missing from Forgejo; nothing to import from")
             return p
         how = f"pull mirror of {upstream}" if upstream else \
@@ -220,7 +220,7 @@ def plan_repo(name, spec, world, fj, cfg):
         p.step(f"Forgejo: import {fj_org}/{name} {how}",
                lambda: import_repo(fj, name, spec, primary, gh_org, fj_org, gh_repo, cfg))
         fj_repo = {"mirror": primary == "github" or bool(upstream), "archived": False,
-                   "private": gh_repo["private"], "_new": True}
+                   "private": bool(gh_repo and gh_repo["private"]), "_new": True}
     else:
         cur = fj_repo["owner"]["login"]
         if fj_repo["archived"] and (cur.lower() != fj_org.lower() or not archived):
@@ -386,7 +386,8 @@ def wait_gh(org, name):
 
 def import_repo(fj, name, spec, primary, gh_org, fj_org, gh_repo, cfg):
     url = gh_url(gh_org, name)
-    body = {"clone_addr": url, "repo_owner": fj_org, "repo_name": name, "private": gh_repo["private"]}
+    # A Forgejo-only upstream mirror has no GitHub copy to take privacy from.
+    body = {"clone_addr": url, "repo_owner": fj_org, "repo_name": name, "private": bool(gh_repo and gh_repo["private"])}
     if spec.get("upstream"):
         body |= {"clone_addr": spec["upstream"], "service": "git", "mirror": True, "mirror_interval": cfg["interval"]}
     elif primary == "github":
