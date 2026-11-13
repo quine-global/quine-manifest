@@ -94,8 +94,13 @@ def gh(*args, check=True):
 
 def gh_org_repos(org):
     """{name: repo} for an org, or None if the org doesn't exist."""
-    if gh(f"orgs/{org}", check=False).returncode:
-        return None
+    r = gh(f"orgs/{org}", check=False)
+    if r.returncode:
+        err = (r.stderr or r.stdout).strip()
+        if "HTTP 404" in err:
+            return None
+        # A bad, expired or under-scoped token isn't a missing org.
+        raise RuntimeError(f"GitHub: can't read org {org}: {err}")
     out = gh("--paginate", f"orgs/{org}/repos?per_page=100&type=all",
              "--jq", ".[] | {name, private, archived, fork, description}").stdout
     return {r["name"]: r for r in map(json.loads, out.splitlines())}
