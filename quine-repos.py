@@ -328,10 +328,13 @@ def plan_renovate(p, name, spec, fj_org, fj_repo, archived, fj, cfg):
     new = fj_repo.get("_new")
     has_user = has_hook = False
     if not new:
-        perm = fj.call("GET", f"/repos/{fj_org}/{name}/collaborators/{user}/permission")
+        # Where it is now: a repo moving buckets is transferred by an earlier
+        # step, and its collaborators and webhooks go with it.
+        cur = fj_repo["owner"]["login"]
+        perm = fj.call("GET", f"/repos/{cur}/{name}/collaborators/{user}/permission")
         has_user = perm[0] == 200 and perm[1].get("permission") in ("write", "admin", "owner")
         has_hook = any(h.get("config", {}).get("url") == url
-                       for h in fj.must("GET", f"/repos/{fj_org}/{name}/hooks") or [])
+                       for h in fj.must("GET", f"/repos/{cur}/{name}/hooks") or [])
     if not renovate_wanted(spec, cfg):
         if has_user or has_hook:
             p.note(f"renovate is off for it, but {user} still has access or its webhook; remove them by hand if meant")
