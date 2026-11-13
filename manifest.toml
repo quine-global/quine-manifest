@@ -2,6 +2,8 @@
 # `python3.14 quine-repos.py` shows drift; `--apply` fixes it. See README.md.
 
 forgejo_url = "https://forge.in.quineglobal.com"
+# The forge's public, read-only view (rgit): what GitHub descriptions link to.
+public_url = "https://git.quineglobal.com"
 
 # Renovate (petersweb-infra's nixos/renovate.nix): dependency update PRs on
 # the forge. For each repo it covers, the script makes its `user` a
@@ -80,7 +82,7 @@ import = "code" # ~3.3 GB of release assets on GitHub, left there
 bucket = "main"
 description = "Continuing the \"Hyper\" legacy. Hyper: a terminal built on web technologies. Maintained by Quine."
 forked_from = "vercel/hyper"
-primary = "github"
+# Forge-primary since 2026-11-13: GitHub is an SSH push mirror (a deploy key).
 import = "code" # ~20 GB of release assets on GitHub
 
 [repos."quintodrome.quineglobal.com"]

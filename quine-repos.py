@@ -107,7 +107,12 @@ def gh_token():
 
 # ── helpers ──────────────────────────────────────────────────────────────────
 def same_url(a, b):
-    norm = lambda u: u.lower().rstrip("/").removesuffix(".git")
+    # https://github.com/o/r, ssh://git@github.com/o/r and git@github.com:o/r
+    # are the same repo (a push mirror may use SSH, with a deploy key).
+    def norm(u):
+        u = u.lower().rstrip("/").removesuffix(".git")
+        u = u.split("://", 1)[-1].split("@", 1)[-1]
+        return u.replace(":", "/", 1) if "/" not in u.split(":", 1)[0] and ":" in u else u
     return norm(a) == norm(b)
 
 
@@ -246,7 +251,8 @@ def plan_repo(name, spec, world, fj, cfg):
     # Forgejo says where a fork came from; GitHub (when Forgejo is primary) points at Forgejo.
     src = spec.get("forked_from")
     fj_note = ("forked from", src if "://" in src else f"https://github.com/{src}") if src else None
-    gh_note = ("mirror of", f"{cfg['forgejo_url'].rstrip('/')}/{fj_org}/{name}") if primary == "forgejo" else None
+    # GitHub is public: point at the forge's public view, not its tailnet address.
+    gh_note = ("mirror of", f"{cfg['public_url'].rstrip('/')}/{fj_org}/{name}.git") if primary == "forgejo" else None
     # The text before the note should match on both hosts: the manifest's
     # `description` if it has one, else an empty side borrows the other's.
     desc = spec.get("description")
@@ -464,7 +470,7 @@ def main():
     for name in args.repos or repos:
         spec = repos[name]
         cfg = {"interval": interval, "bucket": manifest["buckets"][spec["bucket"]],
-               "forgejo_url": manifest["forgejo_url"], "renovate": manifest.get("renovate")}
+               "forgejo_url": manifest["forgejo_url"], "public_url": manifest["public_url"], "renovate": manifest.get("renovate")}
         plans.append(plan_repo(name, spec, world, fj, cfg))
 
     changed = failed = 0
