@@ -83,6 +83,7 @@ bucket = "main"
 description = "Continuing the \"Hyper\" legacy. Hyper: a terminal built on web technologies. Maintained by Quine."
 forked_from = "vercel/hyper"
 # Forge-primary since 2026-11-13: GitHub is an SSH push mirror (a deploy key).
+renovate = true # a fork, but kept up to date here: .forgejo/dependabot.yml
 import = "code" # ~20 GB of release assets on GitHub
 
 [repos."quintodrome.quineglobal.com"]
