@@ -14,14 +14,14 @@ public_url = "https://git.quineglobal.com"
 # dependencies come with upstream merges) or mirrors; a repo's
 # `renovate = true|false` overrides that.
 #
-# Renovate is off now (2026-11-10): Dependabot (quine-global-labs/
+# Renovate is off now (2026-11-10): Dependabot (quine-global/
 # dependabot-core) opens the dependency PRs, as the same account, renamed
 # from `renovate` to `dependabot` so the PRs are its and not a person's. It
 # needs the same write access, which this section still grants; the
 # webhooks it adds now wake nothing.
 [renovate]
 user = "dependabot"
-buckets = ["main", "labs"]
+buckets = ["main"]
 webhook = "http://10.89.0.1:9055/hooks/renovate" # the forge VM, as Forgejo's container sees it
 
 # A bucket is a pair of orgs, one per host. Moving a repo between buckets
@@ -35,10 +35,6 @@ github = "quine-global"
 forgejo = "quine-global"
 mirror_token_file = "~/.config/forgejo/github-mirror-token" # expires 2027-10-12
 
-[buckets.labs]
-github = "quine-global-labs"
-forgejo = "quine-global-labs"
-mirror_token_file = "~/.config/forgejo/github-mirror-token-labs" # expires 2026-11-10
 
 [buckets.boneyard]
 github = "quine-global-boneyard"
@@ -217,7 +213,7 @@ description = "A complete solution to package and build a ready for distribution
 forked_from = "electron-userland/electron-builder"
 import = "code"
 
-# ── labs ─────────────────────────────────────────────────────────────────────
+# ── formerly labs (quine-global-labs, retired 2026-11-13) ───────────────────
 [repos.layer-wizard]
 bucket = "main"
 description = "GUI wizard for permanent rpm-ostree package layers with reboot + rollback, on bootc/image-based Linux systems"
@@ -293,7 +289,7 @@ renovate = true # has its own .forgejo/dependabot.yml: Dependabot covers it
 # mirror-ublue-os-aurora syncs hourly (set by hand); the rest every 8h.
 [repos.mirror-ublue-os-aurora]
 bucket = "main"
-description = "Read-only pull mirror of github.com/ublue-os/aurora. quine-global-labs/aurora merges from here."
+description = "Read-only pull mirror of github.com/ublue-os/aurora. quine-global/aurora merges from here."
 github = false
 upstream = "https://github.com/ublue-os/aurora.git"
 
@@ -404,7 +400,7 @@ upstream = "https://invent.kde.org/plasma/plasma-workspace-wallpapers.git"
 # README and the workflow that makes a branch for each new Plasma release.
 [repos.mirror-kde-plasma-desktop]
 bucket = "main"
-description = "Pull mirror of invent.kde.org/plasma/plasma-desktop. Our fork with Quine Linux changes: quine-global-labs/plasma-desktop."
+description = "Pull mirror of invent.kde.org/plasma/plasma-desktop. Our fork with Quine Linux changes: quine-global/plasma-desktop."
 github = false
 upstream = "https://invent.kde.org/plasma/plasma-desktop.git"
 

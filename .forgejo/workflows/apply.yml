@@ -24,7 +24,6 @@ jobs:
           FORGEJO_TOKEN: ${{ secrets.QUINE_REPOS_FORGEJO_TOKEN }}
           GH_TOKEN: ${{ secrets.QUINE_REPOS_GH_TOKEN }}
           MIRROR_MAIN: ${{ secrets.MIRROR_TOKEN_MAIN }}
-          MIRROR_LABS: ${{ secrets.MIRROR_TOKEN_LABS }}
           MIRROR_BONEYARD: ${{ secrets.MIRROR_TOKEN_BONEYARD }}
           APPLY: ${{ github.event_name == 'workflow_dispatch' && inputs.apply }}
           REPOS: ${{ inputs.repos }}
@@ -39,7 +38,7 @@ jobs:
           tar -xzf "$T/gh.tgz" -C "$T" && export PATH="$T/gh_${V}_linux_$ARCH/bin:$PATH"
           # The buckets' push-mirror tokens, where manifest.toml says.
           mkdir -p ~/.config/forgejo && umask 077
-          for b in MAIN:github-mirror-token LABS:github-mirror-token-labs BONEYARD:github-mirror-token-boneyard; do
+          for b in MAIN:github-mirror-token BONEYARD:github-mirror-token-boneyard; do
             v=MIRROR_${b%%:*}; [ -n "${!v}" ] && printf '%s\n' "${!v}" > ~/.config/forgejo/${b#*:}
           done
           if [ "$APPLY" = true ]; then set -- --apply; else set --; fi

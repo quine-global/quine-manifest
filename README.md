@@ -6,7 +6,6 @@ Declares where every Quine repo lives (this repo: forge.in.quineglobal.com/quine
 | Bucket   | GitHub org              | Forgejo org             | Notes                         |
 |----------|-------------------------|-------------------------|-------------------------------|
 | main     | `quine-global`          | `quine-global`          |                               |
-| labs     | `quine-global-labs`     | `quine-global-labs`     |                               |
 | boneyard | `quine-global-boneyard` | `quine-global-boneyard` | retired repos (not archived)  |
 
 By default Forgejo is primary and push-mirrors to GitHub (`primary = "forgejo"`).
@@ -32,7 +31,7 @@ that changes the manifest shows the plan; run "Apply manifest" by hand to apply
 it. Its secrets, on this repo: `QUINE_REPOS_FORGEJO_TOKEN` (a Forgejo token of
 an owner of every bucket org, with write:repository and write:organization),
 `QUINE_REPOS_GH_TOKEN` (a classic GitHub token with `repo` and `read:org`, since
-it spans orgs), and `MIRROR_TOKEN_MAIN`, `MIRROR_TOKEN_LABS`,
+it spans orgs), and `MIRROR_TOKEN_MAIN` and
 `MIRROR_TOKEN_BONEYARD` (the buckets' mirror tokens, below).
 
 **Run by hand:**
@@ -64,7 +63,7 @@ schedule (Monday mornings), Forgejo workflows, and leaving our own forge
 images to their deploy workflows. Nothing else happens in a repo until that
 PR is merged; put anything repo-specific in its own `renovate.json`.
 
-It covers our own repos in the main and labs buckets by default, not forks
+It covers our own repos in the main bucket by default, not forks
 (`forked_from`: their dependencies come with upstream merges) or mirrors. A
 repo's `renovate = true` or `false` overrides that. Turning it off is only
 reported: remove the collaborator and webhook by hand.
