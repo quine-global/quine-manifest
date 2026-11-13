@@ -1,0 +1,46 @@
+name: Apply manifest
+
+# Makes GitHub and Forgejo match manifest.toml with quine-repos.py. A push to
+# main that changes the manifest or the script shows the plan; run this by
+# hand to apply it (optionally for some repos only). README.md, Credentials.
+
+on:
+  push:
+    branches: [main]
+    paths: [manifest.toml, quine-repos.py]
+  workflow_dispatch:
+    inputs:
+      apply: {description: 'Apply (unticked: only show the plan)', type: boolean, default: true}
+      repos: {description: 'Only these repos, space-separated (empty: all)', required: false}
+
+concurrency: {group: quine-repos, cancel-in-progress: false}
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - env:
+          FORGEJO_TOKEN: ${{ secrets.QUINE_REPOS_FORGEJO_TOKEN }}
+          GH_TOKEN: ${{ secrets.QUINE_REPOS_GH_TOKEN }}
+          MIRROR_MAIN: ${{ secrets.MIRROR_TOKEN_MAIN }}
+          MIRROR_LABS: ${{ secrets.MIRROR_TOKEN_LABS }}
+          MIRROR_BONEYARD: ${{ secrets.MIRROR_TOKEN_BONEYARD }}
+          APPLY: ${{ github.event_name == 'workflow_dispatch' && inputs.apply }}
+          REPOS: ${{ inputs.repos }}
+        run: |
+          set -euo pipefail
+          : "${FORGEJO_TOKEN:?QUINE_REPOS_FORGEJO_TOKEN secret not set}" "${GH_TOKEN:?QUINE_REPOS_GH_TOKEN secret not set}"
+          # gh, which the script calls for GitHub (GH_TOKEN logs it in).
+          V=2.104.0 ARCH=$(dpkg --print-architecture) T=$RUNNER_TEMP
+          curl -fsSLo "$T/gh.tgz" "https://github.com/cli/cli/releases/download/v$V/gh_${V}_linux_$ARCH.tar.gz"
+          curl -fsSL "https://github.com/cli/cli/releases/download/v$V/gh_${V}_checksums.txt" \
+            | grep "linux_$ARCH.tar.gz" | sed "s|gh_.*|$T/gh.tgz|" | sha256sum -c -
+          tar -xzf "$T/gh.tgz" -C "$T" && export PATH="$T/gh_${V}_linux_$ARCH/bin:$PATH"
+          # The buckets' push-mirror tokens, where manifest.toml says.
+          mkdir -p ~/.config/forgejo && umask 077
+          for b in MAIN:github-mirror-token LABS:github-mirror-token-labs BONEYARD:github-mirror-token-boneyard; do
+            v=MIRROR_${b%%:*}; [ -n "${!v}" ] && printf '%s\n' "${!v}" > ~/.config/forgejo/${b#*:}
+          done
+          if [ "$APPLY" = true ]; then set -- --apply; else set --; fi
+          python3 quine-repos.py "$@" $REPOS

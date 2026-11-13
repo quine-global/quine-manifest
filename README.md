@@ -27,6 +27,16 @@ and its push mirror is repointed.
 
 ## Credentials
 
+**From Forgejo Actions** (`.forgejo/workflows/apply.yml`): a push to `main`
+that changes the manifest shows the plan; run "Apply manifest" by hand to apply
+it. Its secrets, on this repo: `QUINE_REPOS_FORGEJO_TOKEN` (a Forgejo token of
+an owner of every bucket org, with write:repository and write:organization),
+`QUINE_REPOS_GH_TOKEN` (a classic GitHub token with `repo` and `read:org`, since
+it spans orgs), and `MIRROR_TOKEN_MAIN`, `MIRROR_TOKEN_LABS`,
+`MIRROR_TOKEN_BONEYARD` (the buckets' mirror tokens, below).
+
+**Run by hand:**
+
 - Forgejo admin token: `$FORGEJO_TOKEN` or `~/.config/forgejo/token`.
 - GitHub admin actions (transfer, archive) and imports: your `gh` login.
 - Push mirrors: each bucket's `mirror_token_file`, a GitHub fine-grained token
