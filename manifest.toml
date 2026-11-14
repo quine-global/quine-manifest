@@ -64,7 +64,10 @@ mirror_token_file = "~/.config/forgejo/github-mirror-token-boneyard" # expires 2
 #   upstream = "<url>"  third-party source: Forgejo pull-mirrors it and push-mirrors on to GitHub
 #   description = "…"  the repo's description on both hosts (before the
 #             Forked from / Mirror of note). Unset: keep whatever the hosts
-#             have, copying one side's to an empty other.
+#             have, copying one side's to an empty other. A side that is a
+#             mirror gets "[MIRROR] " in front: GitHub when Forgejo is
+#             primary, Forgejo when it pull-mirrors (upstream, or primary =
+#             "github"). Don't write it here; the script adds it.
 
 # ── main ─────────────────────────────────────────────────────────────────────
 [repos.quintodrome]

@@ -263,14 +263,19 @@ def plan_repo(name, spec, world, fj, cfg):
     desc = spec.get("description")
     gh_base = desc or (described(gh_repo.get("description"), None) if on_github else "")
     fj_base = desc or described(fj_repo.get("description"), None)
-    if on_github and (want := described(gh_base or fj_base, gh_note)) != (gh_repo.get("description") or ""):
+    # A side that mirrors something else says so first: "[MIRROR] …". GitHub
+    # mirrors Forgejo when Forgejo is primary; Forgejo pull-mirrors GitHub or
+    # an upstream.
+    gh_mirror = primary == "forgejo"
+    fj_mirror = primary == "github" or bool(upstream)
+    if on_github and (want := described(gh_base or fj_base, gh_note, gh_mirror)) != (gh_repo.get("description") or ""):
         p.step(f"GitHub: description → {want!r}",
                lambda want=want: gh("-X", "PATCH", f"repos/{gh_org}/{name}", "-f", f"description={want}"))
     if fj_repo.get("_new"):
-        p.step("Forgejo: set description note", lambda: set_fj_description(fj, fj_org, name, fj_note, gh_base, desc))
-    elif (want := described(fj_base or gh_base, fj_note)) != (fj_repo.get("description") or ""):
+        p.step("Forgejo: set description note", lambda: set_fj_description(fj, fj_org, name, fj_note, gh_base, desc, fj_mirror))
+    elif (want := described(fj_base or gh_base, fj_note, fj_mirror)) != (fj_repo.get("description") or ""):
         p.step(f"Forgejo: description → {want!r}",
-               lambda: set_fj_description(fj, fj_org, name, fj_note, gh_base, desc))
+               lambda: set_fj_description(fj, fj_org, name, fj_note, gh_base, desc, fj_mirror))
 
     # Push mirrors (Forgejo primary) -----------------------------------------
     if on_github and primary == "forgejo":
@@ -360,19 +365,23 @@ def plan_renovate(p, name, spec, fj_org, fj_repo, archived, fj, cfg):
 NOTE_RE = re.compile(r"\s*\((?:forked from|mirror of) https?://[^)\s]+\)|^(?:forked from|mirror of) https?://\S+$", re.I)
 
 
-def described(desc, note):
-    """desc with any of our notes stripped, then `note` = (label, url) appended."""
-    base = NOTE_RE.sub("", desc or "").strip()
-    if not note:
-        return base
-    label, url = note
-    label = label.capitalize()
-    return f"{base} ({label} {url})" if base else f"{label} {url}"
+MIRROR_TAG = "[MIRROR]"
 
 
-def set_fj_description(fj, org, name, note, fallback="", base=None):
+def described(desc, note, mirror=False):
+    """desc with our tag and notes stripped, then `note` = (label, url) appended
+    and, for a mirror, MIRROR_TAG in front."""
+    base = NOTE_RE.sub("", (desc or "").strip().removeprefix(MIRROR_TAG)).strip()
+    if note:
+        label, url = note
+        label = label.capitalize()
+        base = f"{base} ({label} {url})" if base else f"{label} {url}"
+    return f"{MIRROR_TAG} {base}".strip() if mirror else base
+
+
+def set_fj_description(fj, org, name, note, fallback="", base=None, mirror=False):
     desc = fj.must("GET", f"/repos/{org}/{name}").get("description") or ""
-    if (want := described(base or described(desc, None) or fallback, note)) != desc:
+    if (want := described(base or described(desc, None) or fallback, note, mirror)) != desc:
         fj.must("PATCH", f"/repos/{org}/{name}", {"description": want})
 
 
