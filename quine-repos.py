@@ -361,8 +361,10 @@ NOTE_RE = re.compile(r"\s*\((?:forked from|mirror of) https?://[^)\s]+\)|^(?:for
 
 
 def described(desc, note):
-    """desc with any of our notes stripped, then `note` = (label, url) appended."""
-    base = NOTE_RE.sub("", desc or "").strip()
+    """desc with any of our notes stripped, then `note` = (label, url) appended.
+    Also drops a leading "[MIRROR]", a tag mirrors' descriptions carried
+    briefly (2026-11-13)."""
+    base = NOTE_RE.sub("", (desc or "").strip().removeprefix("[MIRROR]")).strip()
     if not note:
         return base
     label, url = note
