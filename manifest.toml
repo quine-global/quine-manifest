@@ -419,30 +419,67 @@ forked_from = "dependabot/dependabot-core"
 
 [repos.keymaker]
 bucket = "main"
+description = "Quine Linux's fork of KeyMaker: quine-v<version> branches are upstream releases plus our commits."
 github = false
 forked_from = "tobagin/keymaker"
 
 [repos.kleopatra]
 bucket = "main"
+description = "Quine Linux's fork of KDE's Kleopatra: quine-v<version> branches are KDE's releases plus our commits."
 github = false
 forked_from = "https://invent.kde.org/pim/kleopatra"
 
 [repos.libkleo]
 bucket = "main"
+description = "Quine Linux's fork of KDE's libkleo: quine-v<version> branches are KDE's releases plus our commits."
 github = false
 forked_from = "https://invent.kde.org/pim/libkleo"
 
 [repos.mirror-keymaker]
 bucket = "main"
+description = "Pull mirror of KeyMaker (github.com/tobagin/keymaker). Our changes are in quine-global/keymaker."
 github = false
 upstream = "https://github.com/tobagin/keymaker.git"
 
 [repos.mirror-kde-kleopatra]
 bucket = "main"
+description = "Pull mirror of KDE's Kleopatra (invent.kde.org/pim/kleopatra). Our changes are in quine-global/kleopatra."
 github = false
 upstream = "https://invent.kde.org/pim/kleopatra.git"
 
 [repos.mirror-kde-libkleo]
 bucket = "main"
+description = "Pull mirror of KDE's libkleo (invent.kde.org/pim/libkleo). Our changes are in quine-global/libkleo."
 github = false
 upstream = "https://invent.kde.org/pim/libkleo.git"
+
+# ── added 2026-11-19 ─────────────────────────────────────────────────────────
+[repos.beszel] # the server monitor at monitor.in.quineglobal.com (petersweb-infra, nixos/beszel.nix)
+bucket = "main"
+description = "Our fork of Beszel, the server monitor: open-connection counts per web server (CONNECTION_PORTS), as a chart and a table column, and readable sign-in errors. quine-v<version> branches are upstream releases plus our commits."
+forked_from = "henrygd/beszel"
+
+[repos.flatpak-repo] # quine-linux docs/DISTRIBUTION.md
+bucket = "main"
+description = "Publishes Quine's Flatpak repository, flatpak.quineglobal.com: imports the apps' uploaded builds, signs them, and updates the repo."
+
+[repos.pocketbase] # private for now
+bucket = "main"
+description = "PocketBase, continued: a mirror of upstream (now at ganigeorgiev.com) merged with felix-schindler's OAuth sign-in for superusers, with the built admin UI committed."
+forked_from = "pocketbase/pocketbase"
+github = false
+
+[repos.dnf5] # private; unused since packages.quineglobal.com took basic auth
+bucket = "main"
+description = "Our fork of dnf5: an auth_method repo option (as proxy_auth_method), so a repo can ask for digest auth. quine-<version> branches are upstream releases plus that commit."
+forked_from = "rpm-software-management/dnf5"
+github = false
+
+# To delete by hand (the script never deletes): listed only so it runs.
+[repos.nixpkgs] # replaced by the quine-26.05 channel (petersweb-infra, nixos/nixpkgs-patches/)
+bucket = "main"
+github = false
+
+[repos.dn5] # empty: a typo for dnf5
+bucket = "main"
+github = false
