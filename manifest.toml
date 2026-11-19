@@ -123,10 +123,9 @@ github = false
 # change given paths); petersweb-infra builds it as a patch on upstream's
 # release (nixos/git-sync/). Actions off: it carries upstream's CI, which
 # builds in upstream's Docker images and fails on our runners.
-[repos.git-sync]
+[repos.git-sync] # GitHub's copy is a real GitHub fork, so PRs to kubernetes/git-sync can come from it
 bucket = "main"
-description = "Our fork of git-sync, with --exechook-path: run the exechook only when given paths change"
-github = false
+description = "Our fork of git-sync, with --exechook-path: run the exechook only when given paths change. Upstream's branches and tags, plus exechook-path (the change, on master) and main (it on v4.8.0)."
 forked_from = "kubernetes/git-sync"
 actions = false
 
