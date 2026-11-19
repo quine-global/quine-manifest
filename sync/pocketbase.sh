@@ -30,8 +30,11 @@ git remote add upstream https://ganigeorgiev.com/git/pocketbase/pocketbase
 git remote add thommorais https://github.com/thommorais/pocketbase.git
 git remote add felix https://github.com/felix-schindler/pocketbase.git
 
-git fetch -q fork quine
-git fetch -q --tags upstream master
+git fetch -q --no-tags fork quine
+# Upstream's tags are upstream's: forced, over any copy that differs (the
+# fork's first tags came from thommorais's mirror, and its v0.42.3 wasn't
+# upstream's).
+git fetch -q --no-tags upstream master '+refs/tags/*:refs/tags/*'
 git fetch -q --no-tags thommorais sync
 git fetch -q --no-tags felix master
 git checkout -q -B quine fork/quine
@@ -60,6 +63,6 @@ if [ "${DRY_RUN:-}" = 1 ]; then
   exit 0
 fi
 git push -q --force fork upstream/master:refs/heads/upstream thommorais/sync:refs/heads/thommorais felix/master:refs/heads/felix
-git push -q fork --tags
+git push -q --force fork 'refs/tags/*:refs/tags/*'
 git push -q fork quine
 echo "pushed: upstream, thommorais, felix, the tags, and quine at $(git rev-parse --short HEAD)"
