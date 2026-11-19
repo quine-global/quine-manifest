@@ -465,11 +465,10 @@ bucket = "main"
 github = false # forge-only, as it was made
 description = "Publishes Quine's Flatpak repository, flatpak.quineglobal.com: imports the apps' uploaded builds, signs them, and updates the repo."
 
-[repos.pocketbase] # private for now
+[repos.pocketbase]
 bucket = "main"
 description = "PocketBase, continued: a mirror of upstream (now at ganigeorgiev.com) merged with felix-schindler's OAuth sign-in for superusers, with the built admin UI committed."
 forked_from = "pocketbase/pocketbase"
-github = false
 actions = false # carries upstream's CI: its tag pushes queued hundreds of jobs (2026-11-19)
 
 [repos.dnf5] # private; unused since packages.quineglobal.com took basic auth
@@ -478,3 +477,7 @@ description = "Our fork of dnf5: an auth_method repo option (as proxy_auth_metho
 forked_from = "rpm-software-management/dnf5"
 github = false
 actions = false # carries upstream's CI: its tag pushes queued hundreds of jobs (2026-11-19)
+
+[repos.nix-overlay] # petersweb-infra's nixos/flake.nix takes it from GitHub
+bucket = "main"
+description = "Quine's additions to nixpkgs, as an overlay: only what nixpkgs lacks, each written so it could go upstream."
