@@ -68,6 +68,22 @@ It covers our own repos in the main bucket by default, not forks
 repo's `renovate = true` or `false` overrides that. Turning it off is only
 reported: remove the collaborator and webhook by hand.
 
+## Syncing forks
+
+`.forgejo/workflows/sync-forks.yml` pulls our forks' upstreams into them,
+daily and by hand (Actions → Sync forks). It runs here, not in the forks,
+so those keep Actions off (`actions = false`): they carry upstream's
+workflows, which the upstream tags it pushes would set off. It pushes with
+`QUINE_REPOS_FORGEJO_TOKEN`.
+
+- **pocketbase** (`sync/pocketbase.sh`): mirrors its three upstreams onto
+  branches `upstream` (ganigeorgiev.com/git/pocketbase/pocketbase, PocketBase
+  itself, and its tags), `thommorais` (thommorais/pocketbase `sync`) and
+  `felix` (felix-schindler/pocketbase `master`), merges all three into
+  `quine`, and rebuilds the committed admin UI (`ui/dist`) when its source
+  changed. A conflict fails the run with nothing pushed: merge by hand in a
+  clone, push `quine`, and the next run carries on.
+
 ## What it won't do
 
 - Delete repositories. A repo that's the wrong kind (a regular repo that should
