@@ -462,6 +462,7 @@ actions = false # carries upstream's CI: its tag pushes queued hundreds of jobs 
 
 [repos.flatpak-repo] # quine-linux docs/DISTRIBUTION.md
 bucket = "main"
+github = false # forge-only, as it was made
 description = "Publishes Quine's Flatpak repository, flatpak.quineglobal.com: imports the apps' uploaded builds, signs them, and updates the repo."
 
 [repos.pocketbase] # private for now
@@ -477,12 +478,3 @@ description = "Our fork of dnf5: an auth_method repo option (as proxy_auth_metho
 forked_from = "rpm-software-management/dnf5"
 github = false
 actions = false # carries upstream's CI: its tag pushes queued hundreds of jobs (2026-11-19)
-
-# To delete by hand (the script never deletes): listed only so it runs.
-[repos.nixpkgs] # replaced by the quine-26.05 channel (petersweb-infra, nixos/nixpkgs-patches/)
-bucket = "main"
-github = false
-
-[repos.dn5] # empty: a typo for dnf5
-bucket = "main"
-github = false
